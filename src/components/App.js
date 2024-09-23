@@ -11,7 +11,12 @@ import { Loader } from './Loader';
 import { ErrorMessage } from './ErrorMessage';
 import { MovieDetails } from './MovieDetails';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { Filters } from './Filters';
+import { FilterSortBar } from './FilterSortBar';
+import { FilterSortBox } from './FilterSortBox';
+import { Button } from './Button';
+import { FilterSVG } from './FilterSVG';
+import { Pages } from './Pages';
+import { Sort } from './Sort';
 
 export const KEY = '329428ec';
 
@@ -164,6 +169,10 @@ export default function App() {
     };
   };
 
+  /* fetches additional movies and adds them to the search results
+  or removes movies from the search results, based on the current page.
+  */
+
   useEffect(() => {
     const fetchMovies = async () => {
       let n = 0;
@@ -234,19 +243,33 @@ export default function App() {
           pages={pages}
         />
       </Navbar>
-      <Filters
-        movies={movies}
-        pages={pages}
-        setPages={setPages}
-        onAddPage={handleAddPage}
-        onRemovePage={handleRemovePage}
-        totalResults={totalResults}
-        isActive={isActive}
-        onSortResults={handleSortResults}
-        isReversed={isReversed}
-        onReverse={handleReverse}
-        isActiveWatchlist={isActiveWatchlist}
-      ></Filters>
+      <FilterSortBar>
+        <FilterSortBox>
+          <Button className={'btn-filter'} isActive={isActive}>
+            <FilterSVG />
+          </Button>
+          <Pages
+            isActive={isActive}
+            pages={pages}
+            setPages={setPages}
+            onRemovePage={handleRemovePage}
+            onAddPage={handleAddPage}
+          />
+          <Sort
+            isActive={isActive}
+            onReverse={handleReverse}
+            onSortResults={handleSortResults}
+          />
+        </FilterSortBox>
+
+        <FilterSortBox>
+          <Sort
+            isActive={isActiveWatchlist}
+            onReverse={handleReverse}
+            onSortResults={handleSortResults}
+          />
+        </FilterSortBox>
+      </FilterSortBar>
       <Main>
         <Box>
           <NumResults

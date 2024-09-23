@@ -257,7 +257,7 @@ export default function App() {
           pages={pages}
         />
       </Navbar>
-      <Filters
+      <FilterSortBar
         movies={movies}
         pages={pages}
         setPages={setPages}
@@ -269,7 +269,7 @@ export default function App() {
         isReversed={isReversed}
         onReverse={handleReverse}
         isActiveWatchlist={isActiveWatchlist}
-      ></Filters>
+      ></FilterSortBar>
       <Main>
         <Box>
           <NumResults
@@ -325,7 +325,7 @@ const Toggle = () => {
   );
 };
 
-const Filters = ({
+const FilterSortBar = ({
   movies,
   pages,
   setPages,
@@ -353,7 +353,7 @@ const Filters = ({
   };
 
   return (
-    <div className="data-bar">
+    <div className="filter-sort-bar">
       <div className="filter">
         <Button className={'btn-filter'} isActive={isActive}>
           <svg

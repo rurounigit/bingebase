@@ -204,14 +204,14 @@ export default function App() {
           //onSearchChange={handleSearchChange}
         />
       </Navbar>
-      <Filters
+      <FilterSortBar
         movies={movies}
         pages={pages}
         setPages={setPages}
         onAddPage={handleAddPage}
         onRemovePage={handleRemovePage}
         totalResults={totalResults}
-      ></Filters>
+      ></FilterSortBar>
       <Main>
         <Box>
           {isLoading ? (
@@ -262,7 +262,7 @@ const Toggle = () => {
   );
 };
 
-const Filters = ({
+const FilterSortBar = ({
   movies,
   pages,
   setPages,
@@ -284,7 +284,7 @@ const Filters = ({
   };
 
   return (
-    <div className="data-bar">
+    <div className="filter-sort-bar">
       <div className="filter">
         <button className="filter-button">
           <svg

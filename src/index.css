@@ -39,13 +39,13 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  height: 6rem;
-  padding: 0 3.2rem;
+  height: auto;
+  padding: 1rem 3.2rem;
   background-color: var(--color-primary);
   border-radius: 0.9rem;
 }
 
-.data-bar {
+.filter-sort-bar {
   display: flex;
   height: auto;
   background-color: none;
@@ -54,14 +54,11 @@ body {
   gap: 2rem;
 }
 
-.filter {
+.filter-sort-box {
   display: flex;
   align-items: center;
   width: calc(50% - 1rem);
   max-width: calc(50% - 1rem);
-  border-radius: 0.9rem;
-  overflow: scroll;
-  position: relative;
 }
 
 .sort {
@@ -74,10 +71,12 @@ body {
 }
 
 .pages {
+  display: flex;
+  align-items: center;
+  /* margin-left: auto; */
+  padding-right: 1.5rem;
   font-size: 1.4rem;
   color: var(--color-text-dark);
-  margin-left: auto;
-  margin-right: 1.5rem;
 }
 
 .pages input {
@@ -496,7 +495,7 @@ body {
   border-radius: 0.9rem;
   font-size: 1.4rem;
   padding: 0.4rem 0.8rem 0rem 0.8rem;
-  margin: 0.2rem;
+  margin-right: 0.9rem;
   font-weight: bold;
   cursor: pointer;
 }

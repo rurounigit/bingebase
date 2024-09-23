@@ -21,12 +21,6 @@ export const Box = ({ hasToggle = false, children }) => {
           {isOpen ? '–' : '+'}
         </button>
       ) : null}
-      {/* <button
-        className="btn-toggle"
-        onClick={() => setIsOpen((open) => !open)}
-      >
-        {isOpen ? '–' : '+'}
-      </button> */}
       {isOpen && children}
     </div>
   );
