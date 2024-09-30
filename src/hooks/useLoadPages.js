@@ -22,7 +22,6 @@ export function useLoadPages(query, callback, pages) {
 
     const fetchMovies = async () => {
       let n = 0;
-      console.log(pages.current);
 
       if (movieListIsEmpty.current && query.length !== 0) {
         n = 0;

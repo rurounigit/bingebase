@@ -23,6 +23,11 @@ html {
   font-size: 62.5%;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
@@ -50,7 +55,7 @@ body {
   height: auto;
   background-color: none;
   border-radius: 0.9rem;
-  padding: 0.6rem 0 0.6rem 0;
+  padding: 0.8rem 0 0.8rem 0;
   gap: 2rem;
 }
 
@@ -74,12 +79,13 @@ body {
   display: flex;
   align-items: center;
   /* margin-left: auto; */
-  padding-right: 1.5rem;
+  padding-right: 0.8rem;
   font-size: 1.4rem;
   color: var(--color-text-dark);
 }
 
 .pages input {
+  height: 2rem;
   padding-left: 0.3rem;
   padding-top: 0.1rem;
   border-radius: 0.9rem;
@@ -100,7 +106,9 @@ body {
 }
 
 .sort select {
+  height: 2.2rem;
   border-radius: 0.9rem;
+  padding: 0.1rem;
   background-color: var(--color-text-dark);
   border: none;
 }
@@ -173,7 +181,7 @@ body {
   width: 40rem;
   transition: all 0s;
   color: var(--color-text);
-  z-index: 999;
+  z-index: 1;
 
   background-color: var(--color-primary-light);
 }
@@ -213,8 +221,10 @@ body {
   position: relative;
   top: 0rem;
   right: 0rem;
-  height: 2.1rem;
-  aspect-ratio: 1;
+  height: 2rem;
+  height: 2rem;
+  width: 2rem;
+  padding: 0.1rem;
   border-radius: 50%;
   border: none;
   background-color: var(--color-background-100);
@@ -243,6 +253,7 @@ body {
   list-style: none;
   padding: 0 0;
   overflow: scroll;
+  background-color: var(--color-background-500);
 }
 
 .list-watched {
@@ -258,8 +269,7 @@ body {
   column-gap: 2rem;
   font-size: 1.6rem;
   align-items: center;
-
-  padding: 1.3rem 1.3rem;
+  padding: 1rem 1rem;
   border-bottom: 1px solid var(--color-background-100);
 }
 
@@ -322,10 +332,14 @@ body {
 /* ******* */
 
 .summary {
-  padding: 2.2rem 3.2rem 1.8rem 3.2rem;
-  border-radius: 0.9rem;
+  position: sticky;
+  top: 2.2rem;
+  padding: 1.4rem 3.2rem 1.4rem 3.2rem;
+  border-radius: 0rem 0rem 0rem 3rem;
   background-color: var(--color-background-100);
-  box-shadow: 0 1.2rem 2.4rem rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.01); */
+  margin-bottom: 0rem;
+  z-index: 999;
 }
 
 .summary h2 {
@@ -392,6 +406,12 @@ body {
   gap: 0.8rem;
 }
 
+.details-overview a {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
 .rating {
   background-color: var(--color-background-100);
   border-radius: 0.9rem;
@@ -443,7 +463,7 @@ body {
   font-size: 1.4rem;
   font-weight: bold;
   cursor: pointer;
-  z-index: 999;
+  z-index: 997;
   margin-right: 0.9rem;
   transition: all 0.3s;
 }
@@ -463,9 +483,10 @@ body {
 }
 
 .btn-back {
-  position: absolute;
+  position: sticky;
   top: 0.6rem;
   left: 0.6rem;
+  margin-top: -3.2rem;
   height: 3.2rem;
   aspect-ratio: 1;
   border-radius: 50%;
@@ -482,6 +503,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s;
+  /* transform: translate(80px, 80px) scale(1.5, 1.5) rotate(45deg); */
 }
 
 .btn-back:hover {
@@ -492,22 +514,40 @@ body {
   background-color: var(--color-primary);
   color: var(--color-text);
   border: none;
+  height: 2.6rem;
   border-radius: 0.9rem;
   font-size: 1.4rem;
   padding: 0.4rem 0.8rem 0rem 0.8rem;
-  margin-right: 0.9rem;
+  margin-right: 1.2rem;
   font-weight: bold;
   cursor: pointer;
+}
+
+.btn-filter-tag {
+  height: 2.2rem;
+  width: 6rem;
+  background-color: var(--color-red);
+  color: var(--color-text);
+  border: none;
+  border-radius: 0.9rem;
+  font-size: 1.4rem;
+  padding: 0.1rem 0.3rem 0.1rem 0.3rem;
+  margin-right: 1rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .btn-filter:focus {
   border: none;
   outline: var(--color-primary-light) solid 2px;
+  transform: translateX(2px);
 }
 
 .btn-filter:active {
   border: none;
   outline: var(--color-primary-light) solid 2px;
+  transform: translateX(2px);
 }
 
 /* The switch - the box around the slider */
@@ -599,6 +639,101 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.modal-content {
+  position: sticky;
+  top: 0;
+  display: flex;
+  gap: 1rem;
+  background-color: var(--color-primary);
+  margin: auto auto;
+  border-bottom: 2px solid var(--color-highlight);
+  width: 100%; /* Could be more or less, depending on screen size */
+  border-radius: 0.9rem 0.9rem 0rem 0rem;
+  box-shadow: 0 1.4rem 1.4rem rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  z-index: 999;
+}
+
+.close {
+  position: absolute;
+  align-content: center;
+  width: 2rem;
+  height: 2rem;
+  right: calc(50% - 8.3rem);
+  top: calc(50% - rem);
+  border-radius: 50%;
+  border: none;
+  background-color: var(--color-red);
+  color: var(--color-background-900);
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close:hover,
+.close:focus {
+  background-color: var(--color-red-dark);
+}
+
+.modal-content h2 {
+  margin-top: 0rem;
+  padding-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.modal-content div {
+  margin-bottom: 0rem;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.modal-content select,
+.modal-content input {
+  height: 2.2rem;
+  width: 6rem;
+  padding: 0.1rem 0.3rem 0.1rem 0.3rem;
+  border-radius: 0.9rem;
+  background-color: var(--color-text-dark);
+  border: none;
+}
+
+.modal-content select:focus-visible {
+  border: none;
+  outline: none;
+}
+
+.modal-content select:active {
+  border: none;
+  outline: var(--color-text) solid 2px;
+}
+
+.modal-content button {
+  background-color: var(--color-primary-light);
+  color: var(--color-text);
+  border: none;
+  border-radius: 10rem;
+  font-size: 1.4rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-content button:hover {
+  background-color: var(--color-primary);
 }
 
 /*

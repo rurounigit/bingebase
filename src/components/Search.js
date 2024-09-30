@@ -13,11 +13,11 @@ export const Search = ({
     inputEl.current.focus();
   }, []); */
 
-  useKey('Enter', () => {
+  /* useKey('Enter', () => {
     if (document.activeElement === inputEl.current) return;
     inputEl.current.focus();
     setQuery('');
-  });
+  }); */
 
   /* useEffect(() => {
     const callback = (e) => {

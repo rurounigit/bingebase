@@ -1,4 +1,4 @@
-export const NumResults = ({
+export const NumResultsWatchlist = ({
   topOpen,
   topClosed,
   movies,
@@ -12,7 +12,7 @@ export const NumResults = ({
       <div
         style={{
           position: 'sticky',
-          top: isFilterFormOpen ? topOpen : topClosed,
+          top: isFilterFormOpen ? '11.8rem' : '9.6rem',
           display: 'flex',
           border: 'none',
           borderRadius: '0rem',

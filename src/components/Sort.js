@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Button } from './Button';
 
-export const Sort = ({ isActive, onReverse, onSortResults }) => {
+export const Sort = ({
+  isActive,
+  onReverse,
+  onSortResults,
+  isReversed,
+}) => {
   const [value, setValue] = useState('Title');
 
   const handleSelect = (e) => {
@@ -39,6 +44,7 @@ export const Sort = ({ isActive, onReverse, onSortResults }) => {
         className="btn-reverse"
         onClick={onReverse}
         isActive={isActive}
+        isReversed={isReversed}
       >
         {'\u21F5'}
       </Button>

@@ -3,8 +3,6 @@ export const Movie = ({ movie, onSelectMovie }) => {
     e.target.src = 'default-poster.png';
   };
 
-  //const poster = 'default-poster.png';
-
   return (
     <li
       key={movie.imdbID}

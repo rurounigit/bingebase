@@ -1,4 +1,7 @@
-export const WatchedSummary = ({ watched }) => {
+export const WatchedSummary = ({
+  watched,
+  isFilterFormWatchedOpen,
+}) => {
   const average = (arr) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
@@ -18,30 +21,44 @@ export const WatchedSummary = ({ watched }) => {
 
   const avgRuntime = Math.round(
     average(
-      moviesWithRuntime.map((movie) => movie.Runtime.split(' ').at(0))
+      moviesWithRuntime.map((movie) =>
+        movie?.Runtime.split(' ').at(0)
+      )
     )
   );
 
   return (
-    <div className="summary">
-      <h2>Movies you watched</h2>
-      <div>
-        <p>
-          <span>#️⃣</span>
-          <span>{watched.length} movies</span>
-        </p>
-        <p>
-          <span>⭐️</span>
-          <span>{avgImdbRating}</span>
-        </p>
-        <p>
-          <span>🌟</span>
-          <span>{avgUserRating}</span>
-        </p>
-        <p>
-          <span>⏳</span>
-          <span>{avgRuntime} min</span>
-        </p>
+    <div
+      style={{
+        position: 'sticky',
+        top: isFilterFormWatchedOpen ? '4.4rem' : '2.2rem',
+
+        /*  padding: '1.4rem 3.2rem 1.4rem 3.2rem', */
+        backgroundColor: 'var(--color-background-500',
+        borderRadius: '0.0',
+        zIndex: '999',
+      }}
+    >
+      <div className="summary">
+        <h2>Movies you watched</h2>
+        <div>
+          <p>
+            <span>#️⃣</span>
+            <span>{watched.length} movies</span>
+          </p>
+          <p>
+            <span>⭐️</span>
+            <span>{avgImdbRating}</span>
+          </p>
+          <p>
+            <span>🌟</span>
+            <span>{avgUserRating}</span>
+          </p>
+          <p>
+            <span>⏳</span>
+            <span>{avgRuntime} min</span>
+          </p>
+        </div>
       </div>
     </div>
   );

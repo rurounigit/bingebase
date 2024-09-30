@@ -3,6 +3,7 @@ import { Navbar } from './Navbar';
 import { Main } from './Main';
 import { Search } from './Search';
 import { NumResults } from './NumResults';
+import { NumResultsWatchlist } from './NumResultsWatchlist';
 import { Box } from './Box';
 import { MovieList } from './MovieList';
 import { WatchedSummary } from './WatchedSummary';
@@ -17,6 +18,8 @@ import { Button } from './Button';
 import { FilterSVG } from './FilterSVG';
 import { Pages } from './Pages';
 import { Sort } from './Sort';
+import { FilterForm } from './FilterForm';
+import { FilterFormWatched } from './FilterFormWatched';
 
 export const KEY = '329428ec';
 
@@ -27,24 +30,224 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState('');
   const [movies, setMovies] = useState([]);
+  const [prevMovies, setPrevMovies] = useState([]);
+  const [watchedFiltered, setWatchedFiltered] = useLocalStorage(
+    [],
+    'watchedFiltered'
+  );
   const [totalResults, setTotalResults] = useState(0);
   const [watched, setWatched] = useLocalStorage([], 'watched');
   const [isReversed, setIsReversed] = useState(false);
+  const [isReversedWatchlist, setIsReversedWatchlist] =
+    useState(false);
+  const [isFilterFormOpen, setIsFilterFormOpen] = useState(false);
+  const [isFilterFormWatchedOpen, setIsFilterFormWatchedOpen] =
+    useState(false);
+  const [filters, setFilters] = useState({ year: '', type: '' });
+  const [filtersWatched, setFiltersWatched] = useState({
+    year: '',
+    type: '',
+    /* runtime: '',
+    genre: '',
+    imdbRating: '',
+    actors: '',
+    director: '',
+    rated: '',
+    ratings: '',
+    imdbVotes: '',
+    userRating: '',
+    rtRating: '', */
+  });
+  const [year, setYear] = useState('');
+  const [type, setType] = useState('');
+  const [yearWatched, setYearWatched] = useState('');
+  const [typeWatched, setTypeWatched] = useState('');
   const isActive = query.length < 3 ? false : true;
-  const isActiveWatchlist = watched.length > 1;
+  const isActiveWatchlist = watched.length > 0;
+  /*  const prevWatched = useRef([]); */
+
+  const handleToggleFilterFormWatched = () => {
+    setIsFilterFormWatchedOpen((isOpen) => !isOpen);
+  };
+
+  const handleCloseFilterFormWatched = () => {
+    setIsFilterFormWatchedOpen(false);
+  };
+
+  const handleToggleFilterForm = () => {
+    setIsFilterFormOpen((isOpen) => !isOpen);
+  };
+
+  const handleCloseFilterForm = () => {
+    setIsFilterFormOpen(false);
+  };
+
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters); // Update filters state
+
+    // Apply filters to movies array
+    const filteredMovies = movies.filter((movie) => {
+      let matchesYear = true;
+      let matchesType = true;
+
+      if (newFilters.year !== '') {
+        // Use newFilters here
+        matchesYear = movie.Year.split('–')[0] === newFilters.year;
+      }
+
+      if (newFilters.type !== '') {
+        // Use newFilters here
+        matchesType = movie.Type === newFilters.type;
+      }
+
+      return matchesYear && matchesType;
+    });
+
+    setMovies(filteredMovies);
+  };
+
+  const handleRemoveFilter = (filterKey) => {
+    // Update filters state (remove the filter)
+
+    if (filterKey === 'year') {
+      setYear('');
+    }
+    if (filterKey === 'type') {
+      setType('');
+    }
+
+    const updatedFilters = { ...filters };
+    updatedFilters[filterKey] = '';
+    setFilters(updatedFilters);
+
+    // Re-apply filters to movies array (without the removed filter)
+    if (updatedFilters.year === '' && updatedFilters.type === '') {
+      // If both filters are now empty, reset to original movies
+      setMovies(prevMovies);
+    } else {
+      const filteredMovies = prevMovies.filter((movie) => {
+        let matchesYear = true;
+        let matchesType = true;
+
+        if (updatedFilters.year !== '') {
+          matchesYear = movie.Year === updatedFilters.year;
+        }
+        if (updatedFilters.type !== '') {
+          matchesType = movie.Type === updatedFilters.type;
+        }
+        return matchesYear && matchesType;
+      });
+      setMovies(filteredMovies);
+    }
+  };
+
+  const handleApplyFiltersWatched = (newFilters) => {
+    setFiltersWatched(newFilters); // Update filters state
+
+    /*  // Apply filters to movies array
+    const filteredMovies = watched.filter((movie) => {
+      let matchesYear = true;
+      let matchesType = true;
+
+      if (newFilters.year !== '') {
+        // Use newFilters here
+        matchesYear = movie.year.split('–')[0] === newFilters.year;
+      }
+
+      if (newFilters.type !== '') {
+        // Use newFilters here
+        matchesType = movie.type === newFilters.type;
+      }
+
+      return matchesYear && matchesType;
+    });
+
+    setWatchedFiltered(filteredMovies); */
+  };
+
+  const handleRemoveFilterWatched = (filterKey) => {
+    // Update filters state (remove the filter)
+
+    if (filterKey === 'year') {
+      setYearWatched('');
+    }
+    if (filterKey === 'type') {
+      setTypeWatched('');
+    }
+
+    const updatedFilters = { ...filtersWatched };
+    updatedFilters[filterKey] = '';
+    setFiltersWatched(updatedFilters);
+
+    /* // Re-apply filters to movies array (without the removed filter)
+    if (updatedFilters.year === '' && updatedFilters.type === '') {
+      // If both filters are now empty, reset to original movies
+      setWatchedFiltered(watched);
+    } else {
+      const filteredMovies = watched.filter((movie) => {
+        let matchesYear = true;
+        let matchesType = true;
+
+        if (updatedFilters.year !== '') {
+          matchesYear = movie.year.split('–')[0] === updatedFilters.year;
+        }
+        if (updatedFilters.type !== '') {
+          matchesType = movie.type === updatedFilters.type;
+        }
+        return matchesYear && matchesType;
+      });
+      setWatchedFiltered(filteredMovies);
+    } */
+  };
 
   const handleSortResults = (e) => {
     const prop = e.target.value;
-    const sortedByProp = [...movies].sort((a, b) =>
-      b[prop].localeCompare(a[prop])
-    );
+    let sortedByProp = [];
+    if (prop === 'Title') {
+      sortedByProp = isReversed ? prevMovies.reverse() : prevMovies;
+    } else {
+      sortedByProp = [...movies].sort((a, b) =>
+        b[prop].localeCompare(a[prop])
+      );
+    }
+    /* const sortedByProp =
+      prop === 'Title'
+        ? prevMovies
+        : [...movies].sort((a, b) => b[prop].localeCompare(a[prop])); */
     setMovies(sortedByProp);
+  };
+
+  const handleSortWatchlist = (e) => {
+    const prop = e.target.value;
+
+    let sortedByProp = [];
+    if (prop === 'Title') {
+      sortedByProp = isReversed ? watched.reverse() : watched;
+    } else {
+      sortedByProp = [...watchedFiltered].sort((a, b) =>
+        b[prop].localeCompare(a[prop])
+      );
+    }
+
+    /* const sortedByProp =
+      prop === 'Title'
+        ? watched
+        : [...watchedFiltered].sort((a, b) =>
+            b[prop].localeCompare(a[prop])
+          ); */
+    setWatchedFiltered(sortedByProp);
   };
 
   const handleReverse = () => {
     setIsReversed((prev) => !prev);
     const reversed = [...movies].reverse();
     setMovies(reversed);
+  };
+
+  const handleReverseWatchlist = () => {
+    setIsReversedWatchlist((prev) => !prev);
+    const reversed = [...watchedFiltered].reverse();
+    setWatchedFiltered(reversed);
   };
 
   const handleAddPage = () => {
@@ -73,6 +276,13 @@ export default function App() {
       Runtime: movie.Runtime,
       imdbRating: movie.imdbRating,
       userRating: rating,
+      rtRating: movie.rtRating,
+      Rated: movie.Rated,
+      Type: movie.Type,
+      Genre: movie.Genre,
+      Actors: movie.Actors,
+      Director: movie.Director,
+      imdbVotes: movie.imdbVotes,
     };
 
     setWatched((watched) =>
@@ -104,11 +314,10 @@ export default function App() {
     setSelectedID(null);
   }
 
+  // onChange Event handler for the Search component to fetch movies (with AbortController and Timeout)
   const cleanupRef = useRef();
 
   const handleSearchChange = async (query, pages) => {
-    setPages({ previous: 1, current: 1 });
-    setMovies([]);
     if (cleanupRef.current) {
       cleanupRef.current();
     }
@@ -138,6 +347,9 @@ export default function App() {
           }
 
           setTotalResults(data.totalResults);
+
+          setPrevMovies((movies) => [...movies, ...data.Search]);
+          //prevMovies.current = [...movies, ...data.Search];
           setMovies((movies) => [...movies, ...data.Search]);
           setHasError('');
         } catch (err) {
@@ -166,8 +378,35 @@ export default function App() {
     cleanupRef.current = () => {
       controller.abort();
       clearTimeout(timer);
+      setPages({ previous: 1, current: 1 });
+      setMovies([]);
+      setPrevMovies([]);
+      //prevMovies.current = [];
     };
   };
+
+  useEffect(() => {
+    console.log(filtersWatched);
+    if (filtersWatched.year === '' && filtersWatched.type === '') {
+      // If both filters are now empty, reset to original movies
+      setWatchedFiltered(watched);
+    } else {
+      const filteredMovies = watched.filter((movie) => {
+        let matchesYear = true;
+        let matchesType = true;
+
+        if (filtersWatched.year !== '') {
+          matchesYear =
+            movie.Year.split('–')[0] === filtersWatched.year;
+        }
+        if (filtersWatched.type !== '') {
+          matchesType = movie.Type === filtersWatched.type;
+        }
+        return matchesYear && matchesType;
+      });
+      setWatchedFiltered(filteredMovies);
+    }
+  }, [watched, setWatchedFiltered, filtersWatched]);
 
   /* fetches additional movies and adds them to the search results
   or removes movies from the search results, based on the current page.
@@ -211,6 +450,8 @@ export default function App() {
             throw new Error('No results found.');
 
           setTotalResults(data.totalResults);
+          setPrevMovies((movies) => [...movies, ...data.Search]);
+          //prevMovies.current = [...movies, ...data.Search];
           setMovies((movies) => [...movies, ...data.Search]);
           setHasError('');
         } catch (err) {
@@ -245,7 +486,12 @@ export default function App() {
       </Navbar>
       <FilterSortBar>
         <FilterSortBox>
-          <Button className={'btn-filter'} isActive={isActive}>
+          <Button
+            className={'btn-filter'}
+            isFilterFormOpen={isFilterFormOpen}
+            isActive={isActive}
+            onClick={handleToggleFilterForm}
+          >
             <FilterSVG />
           </Button>
           <Pages
@@ -255,6 +501,22 @@ export default function App() {
             onRemovePage={handleRemovePage}
             onAddPage={handleAddPage}
           />
+          {filters.year && (
+            <Button
+              className="btn-filter-tag"
+              onClick={() => handleRemoveFilter('year')}
+            >
+              {filters.year} &times;
+            </Button>
+          )}
+          {filters.type && (
+            <Button
+              className="btn-filter-tag"
+              onClick={() => handleRemoveFilter('type')}
+            >
+              {filters.type} &times;
+            </Button>
+          )}
           <Sort
             isActive={isActive}
             onReverse={handleReverse}
@@ -263,20 +525,64 @@ export default function App() {
         </FilterSortBox>
 
         <FilterSortBox>
+          <Button
+            className={'btn-filter'}
+            isFilterFormOpen={isFilterFormWatchedOpen}
+            isActive={isActiveWatchlist}
+            onClick={handleToggleFilterFormWatched}
+          >
+            <FilterSVG />
+          </Button>
+          {filtersWatched.year && (
+            <Button
+              className="btn-filter-tag"
+              onClick={() => handleRemoveFilterWatched('year')}
+            >
+              {filtersWatched.year} &times;
+            </Button>
+          )}
+          {filtersWatched.type && (
+            <Button
+              className="btn-filter-tag"
+              onClick={() => handleRemoveFilterWatched('type')}
+            >
+              {filtersWatched.type} &times;
+            </Button>
+          )}
           <Sort
             isActive={isActiveWatchlist}
-            onReverse={handleReverse}
-            onSortResults={handleSortResults}
+            onReverse={handleReverseWatchlist}
+            onSortResults={handleSortWatchlist}
+            isReversed={isReversedWatchlist}
           />
         </FilterSortBox>
       </FilterSortBar>
+
       <Main>
         <Box>
+          <FilterForm
+            onClose={handleCloseFilterForm}
+            onApplyFilters={handleApplyFilters}
+            movies={movies}
+            isFilterFormOpen={isFilterFormOpen}
+            year={year}
+            setYear={setYear}
+            type={type}
+            setType={setType}
+          />
           <NumResults
             movies={movies}
             totalResults={totalResults}
             isActive={isActive}
-          />
+            isFilterFormOpen={isFilterFormOpen}
+            topOpen={'4.2rem'}
+            topClosed={'2.2rem'}
+          >
+            {' '}
+            showing <strong>{movies.length}</strong> of{' '}
+            <strong>{totalResults}</strong> results
+          </NumResults>
+
           {isLoading ? (
             <Loader />
           ) : hasError ? (
@@ -289,6 +595,18 @@ export default function App() {
           )}
         </Box>
         <Box>
+          <FilterFormWatched
+            onApplyFiltersWatched={handleApplyFiltersWatched}
+            watched={watchedFiltered}
+            isFilterFormWatchedOpen={
+              selectedID ? false : isFilterFormWatchedOpen
+            }
+            yearWatched={yearWatched}
+            setYearWatched={setYearWatched}
+            typeWatched={typeWatched}
+            setTypeWatched={setTypeWatched}
+          />
+
           {selectedID ? (
             <MovieDetails
               selectedID={selectedID}
@@ -300,9 +618,23 @@ export default function App() {
             />
           ) : (
             <>
-              <WatchedSummary watched={watched} />
-              <WatchedMoviesList
+              <WatchedSummary
                 watched={watched}
+                isFilterFormWatchedOpen={isFilterFormWatchedOpen}
+              />
+              <NumResultsWatchlist
+                movies={watchedFiltered}
+                totalResults={watched.length}
+                isActive={isActiveWatchlist}
+                isFilterFormOpen={isFilterFormWatchedOpen}
+                topOpen={'6.2rem'}
+                topClosed={'4.2rem'}
+              >
+                showing <strong>{watchedFiltered.length}</strong> of{' '}
+                <strong>{watched.length}</strong> results
+              </NumResultsWatchlist>
+              <WatchedMoviesList
+                watched={watchedFiltered}
                 onSelectMovie={handleSelectMovie}
                 onDeleteMovie={handleDeleteMovie}
               />
