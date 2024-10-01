@@ -19,27 +19,29 @@ export const MovieDetails = ({
   const [plotIsShort, setPlotIsShort] = useState(true);
 
   const {
-    Title: Title,
-    Released: Released,
-    Runtime: Runtime,
-    Genre: Genre,
-    Plot: Plot,
-    Plotfull: Plotfull,
-    imdbID: imdbID,
-    imdbRating: imdbRating,
-    Actors: Actors,
-    Director: Director,
-    Poster: Poster,
-    Rated: Rated,
-    Ratings: Ratings,
-    imdbVotes: imdbVotes,
-    Awards: Awards,
-    Type: Type,
+    Title,
+    Released,
+    Runtime,
+    Genre,
+    Plot,
+    Plotfull,
+    imdbID,
+    imdbRating,
+    Actors,
+    Director,
+    Poster,
+    Rated,
+    Ratings,
+    imdbVotes,
+    Awards,
+    Type,
   } = movie;
 
   const savedRating = watched.find(
     (movie) => movie.imdbID === selectedID
-  )?.userRating;
+  )?.userRating
+    ? watched.find((movie) => movie.imdbID === selectedID)?.userRating
+    : 0;
 
   const isWatched = watched.some(
     (watchedMovie) => watchedMovie.imdbID === movie.imdbID

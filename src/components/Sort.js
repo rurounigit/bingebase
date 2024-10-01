@@ -6,8 +6,9 @@ export const Sort = ({
   onReverse,
   onSortResults,
   isReversed,
+  options = [{ value: 'value', label: 'Value' }],
 }) => {
-  const [value, setValue] = useState('Title');
+  const [value, setValue] = useState(options[0].value);
 
   const handleSelect = (e) => {
     setValue(e.target.value);
@@ -35,9 +36,16 @@ export const Sort = ({
             cursor: !isActive ? 'default' : 'pointer',
           }}
         >
-          <option value="Title">Title</option>
-          <option value="Year">Year</option>
-          <option value="Type">Type</option>
+          {options.map((option) => (
+            <option value={option.value} key={option.value}>
+              {option.icon} {option.label}
+            </option>
+          ))}
+          {/*  <option value="Title">🗄️Title</option>
+          <option value="Year">🗓️ Year</option>
+          <option value="Type">🎬 Type</option>
+          <option value="imdbRating">⭐️ imdb</option>
+          <option value="userRating">🌟 user</option> */}
         </select>
       </label>
       <Button

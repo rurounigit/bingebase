@@ -103,7 +103,7 @@ export default function App() {
       return matchesYear && matchesType;
     });
 
-    setMovies(filteredMovies);
+    setMovies(isReversed ? filteredMovies.reverse() : filteredMovies);
   };
 
   const handleRemoveFilter = (filterKey) => {
@@ -123,7 +123,7 @@ export default function App() {
     // Re-apply filters to movies array (without the removed filter)
     if (updatedFilters.year === '' && updatedFilters.type === '') {
       // If both filters are now empty, reset to original movies
-      setMovies(prevMovies);
+      setMovies(isReversed ? prevMovies.reverse() : prevMovies);
     } else {
       const filteredMovies = prevMovies.filter((movie) => {
         let matchesYear = true;
@@ -137,7 +137,9 @@ export default function App() {
         }
         return matchesYear && matchesType;
       });
-      setMovies(filteredMovies);
+      setMovies(
+        isReversed ? filteredMovies.reverse() : filteredMovies
+      );
     }
   };
 
@@ -210,32 +212,36 @@ export default function App() {
         b[prop].localeCompare(a[prop])
       );
     }
-    /* const sortedByProp =
-      prop === 'Title'
-        ? prevMovies
-        : [...movies].sort((a, b) => b[prop].localeCompare(a[prop])); */
-    setMovies(sortedByProp);
+
+    setMovies(isReversed ? sortedByProp.reverse() : sortedByProp);
   };
 
   const handleSortWatchlist = (e) => {
     const prop = e.target.value;
 
     let sortedByProp = [];
-    if (prop === 'Title') {
-      sortedByProp = isReversed ? watched.reverse() : watched;
+    if (prop === 'As added') {
+      sortedByProp = isReversedWatchlist
+        ? watched.reverse()
+        : watched;
+    } else if (prop === 'Title') {
+      sortedByProp = [...watchedFiltered].sort((a, b) =>
+        a[prop].localeCompare(b[prop])
+      );
+    } else if (prop === 'userRating') {
+      sortedByProp = [...watchedFiltered].sort(
+        (a, b) => b[prop] - a[prop]
+      );
     } else {
       sortedByProp = [...watchedFiltered].sort((a, b) =>
         b[prop].localeCompare(a[prop])
       );
     }
 
-    /* const sortedByProp =
-      prop === 'Title'
-        ? watched
-        : [...watchedFiltered].sort((a, b) =>
-            b[prop].localeCompare(a[prop])
-          ); */
-    setWatchedFiltered(sortedByProp);
+    console.log(sortedByProp);
+    setWatchedFiltered(
+      isReversedWatchlist ? sortedByProp.reverse() : sortedByProp
+    );
   };
 
   const handleReverse = () => {
@@ -324,6 +330,7 @@ export default function App() {
 
     const controller = new AbortController();
     const fetchMovies = async () => {
+      setIsReversed(false);
       let n = 0;
 
       while (n < pages.current) {
@@ -389,7 +396,10 @@ export default function App() {
     console.log(filtersWatched);
     if (filtersWatched.year === '' && filtersWatched.type === '') {
       // If both filters are now empty, reset to original movies
-      setWatchedFiltered(watched);
+
+      setWatchedFiltered(
+        isReversedWatchlist ? watched.reverse() : watched
+      );
     } else {
       const filteredMovies = watched.filter((movie) => {
         let matchesYear = true;
@@ -404,9 +414,18 @@ export default function App() {
         }
         return matchesYear && matchesType;
       });
-      setWatchedFiltered(filteredMovies);
+      setWatchedFiltered(
+        isReversedWatchlist
+          ? filteredMovies.reverse()
+          : filteredMovies
+      );
     }
-  }, [watched, setWatchedFiltered, filtersWatched]);
+  }, [
+    watched,
+    setWatchedFiltered,
+    filtersWatched,
+    isReversedWatchlist,
+  ]);
 
   /* fetches additional movies and adds them to the search results
   or removes movies from the search results, based on the current page.
@@ -450,9 +469,19 @@ export default function App() {
             throw new Error('No results found.');
 
           setTotalResults(data.totalResults);
-          setPrevMovies((movies) => [...movies, ...data.Search]);
-          //prevMovies.current = [...movies, ...data.Search];
-          setMovies((movies) => [...movies, ...data.Search]);
+          if (isReversed) {
+            setPrevMovies((movies) =>
+              [...movies, ...data.Search].reverse()
+            );
+            //prevMovies.current = [...movies, ...data.Search];
+            setMovies((movies) =>
+              [...movies, ...data.Search].reverse()
+            );
+          } else {
+            setPrevMovies((movies) => [...movies, ...data.Search]);
+            //prevMovies.current = [...movies, ...data.Search];
+            setMovies((movies) => [...movies, ...data.Search]);
+          }
           setHasError('');
         } catch (err) {
           if (err.name === 'AbortError') return;
@@ -472,7 +501,7 @@ export default function App() {
     fetchMovies();
 
     return () => {};
-  }, [query, pages]);
+  }, [query, pages, isReversed]);
 
   return (
     <>
@@ -521,8 +550,20 @@ export default function App() {
             isActive={isActive}
             onReverse={handleReverse}
             onSortResults={handleSortResults}
+            isReversed={isReversed}
+            options={[
+              { value: 'Title', label: 'Title', icon: '#️⃣' },
+              { value: 'Year', label: 'Year', icon: '🗓️' },
+              { value: 'Type', label: 'Type', icon: '🎬' },
+            ]}
           />
         </FilterSortBox>
+
+        {/* <option value="Title">🗄️Title</option>
+        <option value="Year">🗓️ Year</option>
+        <option value="Type">🎬 Type</option>
+        <option value="imdbRating">⭐️ imdb</option>
+        <option value="userRating">🌟 user</option> */}
 
         <FilterSortBox>
           <Button
@@ -554,6 +595,14 @@ export default function App() {
             onReverse={handleReverseWatchlist}
             onSortResults={handleSortWatchlist}
             isReversed={isReversedWatchlist}
+            options={[
+              { value: 'As added', label: 'As added', icon: '⤵️' },
+              { value: 'Title', label: 'Title', icon: '#️⃣' },
+              { value: 'Year', label: 'Year', icon: '🗓️' },
+              { value: 'Type', label: 'Type', icon: '🎬' },
+              { value: 'imdbRating', label: 'imdb', icon: '⭐️' },
+              { value: 'userRating', label: 'user', icon: '🌟' },
+            ]}
           />
         </FilterSortBox>
       </FilterSortBar>
@@ -561,7 +610,6 @@ export default function App() {
       <Main>
         <Box>
           <FilterForm
-            onClose={handleCloseFilterForm}
             onApplyFilters={handleApplyFilters}
             movies={movies}
             isFilterFormOpen={isFilterFormOpen}

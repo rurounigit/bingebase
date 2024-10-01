@@ -32,11 +32,26 @@ export const WatchedMoviesList = ({
             </p>
             <p>
               <span>🌟</span>
-              <span>{movie?.userRating ?? 'no user rating'}</span>
+              <span>
+                {movie.userRating === 0
+                  ? 'no user rating'
+                  : movie.userRating}
+              </span>
             </p>
             <p>
               <span>⏳</span>
               <span>{movie.Runtime}</span>
+            </p>
+            <p>
+              <span style={{ opacity: '0.3' }}>🗓️</span>
+              <span style={{ opacity: '0.3' }}>{movie.Year}</span>
+            </p>
+            <p>
+              <span style={{ opacity: '0.3' }}>
+                {movie.Type === 'movie' && '🎬'}
+                {movie.Type === 'series' && '📺'}
+                {movie.Type === 'game' && '🎮'}
+              </span>
             </p>
             {watched.some(
               (watchedMovie) => watchedMovie.imdbID === movie.imdbID

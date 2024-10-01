@@ -72,7 +72,9 @@ export const StarRating = ({
           ? messages[tempRating ? tempRating - 1 : rating - 1]
           : tempRating
           ? tempRating
-          : rating || 'Rate now!'}
+          : rating === 0
+          ? 'Rate now!'
+          : rating}
       </p>
     </div>
   );

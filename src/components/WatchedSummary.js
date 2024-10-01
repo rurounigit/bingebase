@@ -40,7 +40,7 @@ export const WatchedSummary = ({
       }}
     >
       <div className="summary">
-        <h2>Movies you watched</h2>
+        <h2>Watchlist</h2>
         <div>
           <p>
             <span>#️⃣</span>
