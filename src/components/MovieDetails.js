@@ -12,6 +12,9 @@ export const MovieDetails = ({
   onAddMovie,
   onDeleteMovie,
   watched,
+  hasMouseEnteredBox = false,
+  onMouseEnterBox,
+  onMouseLeaveBox,
 }) => {
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailError, setDetailError] = useState('');
@@ -142,8 +145,15 @@ export const MovieDetails = ({
         <ErrorMessage message={detailError} />
       ) : (
         <>
-          <header>
-            <button className="btn-back" onClick={onCloseMovie}>
+          <header
+            onMouseEnter={onMouseEnterBox}
+            onMouseLeave={onMouseLeaveBox}
+          >
+            <button
+              className="btn-back"
+              onClick={onCloseMovie}
+              style={{ opacity: hasMouseEnteredBox ? '1' : '0' }}
+            >
               &larr;
             </button>
 

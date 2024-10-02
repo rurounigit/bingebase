@@ -1,8 +1,6 @@
 export const NumResults = ({
   topOpen,
   topClosed,
-  movies,
-  totalResults,
   isActive = true,
   isFilterFormOpen,
   children,

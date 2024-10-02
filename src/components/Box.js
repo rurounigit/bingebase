@@ -1,6 +1,11 @@
 import { useState } from 'react';
 
-export const Box = ({ hasToggle = false, children }) => {
+export const Box = ({
+  hasToggle = false,
+  onMouseEnter,
+  onMouseLeave,
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(true);
   return (
     <div

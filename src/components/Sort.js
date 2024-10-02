@@ -41,11 +41,6 @@ export const Sort = ({
               {option.icon} {option.label}
             </option>
           ))}
-          {/*  <option value="Title">🗄️Title</option>
-          <option value="Year">🗓️ Year</option>
-          <option value="Type">🎬 Type</option>
-          <option value="imdbRating">⭐️ imdb</option>
-          <option value="userRating">🌟 user</option> */}
         </select>
       </label>
       <Button

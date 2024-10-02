@@ -1,7 +1,6 @@
 export const NumResultsWatchlist = ({
   topOpen,
   topClosed,
-  movies,
   totalResults,
   isActive = true,
   isFilterFormOpen,
@@ -12,7 +11,8 @@ export const NumResultsWatchlist = ({
       <div
         style={{
           position: 'sticky',
-          top: isFilterFormOpen ? '11.8rem' : '9.6rem',
+          /*  top: isFilterFormOpen ? '11.8rem' : '9.6rem', */
+          top: isFilterFormOpen ? topOpen : topClosed,
           display: 'flex',
           border: 'none',
           borderRadius: '0rem',

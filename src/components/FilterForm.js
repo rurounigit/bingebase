@@ -17,12 +17,12 @@ export const FilterForm = ({
 
   const handleSelectYear = (e) => {
     setYear(e.target.value);
-    onApplyFilters({ year: e.target.value, type });
+    onApplyFilters({ Year: e.target.value, Type: type });
   };
 
   const handleSelectType = (e) => {
     setType(e.target.value);
-    onApplyFilters({ year, type: e.target.value });
+    onApplyFilters({ Year: year, Type: e.target.value });
   };
 
   return (

@@ -20,9 +20,7 @@ export const Button = ({
         transform: isFilterFormOpen
           ? 'translateX(2px)'
           : 'translateX(0px)',
-        color: isReversed
-          ? 'var(--color-red)'
-          : 'var(--color-text-dark)',
+        color: isReversed ? 'var(--color-red)' : 'var(--color-text)',
       }}
     >
       {children}

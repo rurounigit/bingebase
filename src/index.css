@@ -107,6 +107,7 @@ body {
 
 .sort select {
   height: 2.2rem;
+  min-width: 9.5rem;
   border-radius: 0.9rem;
   padding: 0.1rem;
   background-color: var(--color-text-dark);
@@ -487,6 +488,7 @@ body {
   top: 0.6rem;
   left: 0.6rem;
   margin-top: -3.2rem;
+  margin-left: -3.2rem;
   height: 3.2rem;
   aspect-ratio: 1;
   border-radius: 50%;
@@ -702,7 +704,7 @@ input:checked + .slider:before {
 .modal-content select,
 .modal-content input {
   height: 2.2rem;
-  width: 6rem;
+  min-width: 7rem;
   padding: 0.1rem 0.3rem 0.1rem 0.3rem;
   border-radius: 0.9rem;
   background-color: var(--color-text-dark);

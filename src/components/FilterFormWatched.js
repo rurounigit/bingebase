@@ -18,16 +18,16 @@ export const FilterFormWatched = ({
   const handleSelectYear = (e) => {
     setYearWatched(e.target.value);
     onApplyFiltersWatched({
-      year: e.target.value,
-      type: typeWatched,
+      Year: e.target.value,
+      Type: typeWatched,
     });
   };
 
   const handleSelectType = (e) => {
     setTypeWatched(e.target.value);
     onApplyFiltersWatched({
-      year: yearWatched,
-      type: e.target.value,
+      Year: yearWatched,
+      Type: e.target.value,
     });
   };
 
