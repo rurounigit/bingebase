@@ -1,8 +1,8 @@
 import { Movie } from './Movie';
 
-export const MovieList = ({ movies, onSelectMovie }) => (
+export const MovieList = ({ searchResults, onSelectMovie }) => (
   <ul className="list list-movies">
-    {movies?.map((movie) => (
+    {searchResults?.map((movie) => (
       <Movie
         movie={movie}
         key={movie.imdbID}

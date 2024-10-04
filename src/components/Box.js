@@ -1,11 +1,6 @@
 import { useState } from 'react';
 
-export const Box = ({
-  hasToggle = false,
-  onMouseEnter,
-  onMouseLeave,
-  children,
-}) => {
+export const Box = ({ hasToggle = false, children }) => {
   const [isOpen, setIsOpen] = useState(true);
   return (
     <div
@@ -20,7 +15,7 @@ export const Box = ({
     >
       {hasToggle ? (
         <button
-          className="btn-toggle"
+          className="btn-toggle-box"
           onClick={() => setIsOpen((open) => !open)}
         >
           {isOpen ? '–' : '+'}

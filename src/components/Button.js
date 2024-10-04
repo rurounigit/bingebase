@@ -1,10 +1,14 @@
 export const Button = ({
   className,
-  isActive = true,
   onClick,
+  isActive = true,
+  toggleOutline = false,
+  toggleTextColor = false,
+  toggleTextColors = {
+    on: 'var(--color-red)',
+    off: 'var(--color-text)',
+  },
   children,
-  isFilterFormOpen = false,
-  isReversed = false,
 }) => {
   return (
     <button
@@ -12,15 +16,17 @@ export const Button = ({
       disabled={!isActive}
       className={className}
       style={{
-        opacity: !isActive ? '0.3' : '1',
-        cursor: !isActive ? 'default' : 'pointer',
-        outline: isFilterFormOpen
+        opacity: isActive ? '1' : '0.3',
+        cursor: isActive ? 'pointer' : 'default',
+        outline: toggleOutline
           ? 'var(--color-primary-light) solid 2px'
           : 'none',
-        transform: isFilterFormOpen
+        transform: toggleOutline
           ? 'translateX(2px)'
           : 'translateX(0px)',
-        color: isReversed ? 'var(--color-red)' : 'var(--color-text)',
+        color: toggleTextColor
+          ? toggleTextColors.on
+          : toggleTextColors.off,
       }}
     >
       {children}

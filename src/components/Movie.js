@@ -21,14 +21,7 @@ export const Movie = ({ movie, onSelectMovie }) => {
           <span>🗓</span>
           <span>{movie.Year}</span>
         </p>
-        {/*  <span
-          style={{
-            fontSize: '1.5rem',
-            marginLeft: 'auto',
-            opacity: '0.2',
-          }}
-        > */}
-        {/* {movie.Type} */}
+
         <span style={{ opacity: '0.7' }}>
           {movie.Type === 'movie' ? '🎬' : '📺'}
         </span>

@@ -4,10 +4,10 @@ import { KEY } from '../components/App';
 export function useLoadPages(query, callback, pages) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState('');
-  const [movies, setMovies] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [totalResults, setTotalResults] = useState('');
   const movieListIsEmpty = useRef(true);
-  movieListIsEmpty.current = movies.length === 0;
+  movieListIsEmpty.current = searchResults.length === 0;
 
   const callbackRef = useRef();
 
@@ -27,10 +27,11 @@ export function useLoadPages(query, callback, pages) {
         n = 0;
       } else if (pages.current < pages.previous) {
         n = pages.current;
-        setMovies((movies) =>
-          movies.slice(
+        setSearchResults((searchResults) =>
+          searchResults.slice(
             0,
-            movies.length - (pages.previous - pages.current) * 10
+            searchResults.length -
+              (pages.previous - pages.current) * 10
           )
         );
       } else {
@@ -58,7 +59,10 @@ export function useLoadPages(query, callback, pages) {
             throw new Error('No results found.');
 
           setTotalResults(data.totalResults);
-          setMovies((movies) => [...movies, ...data.Search]);
+          setSearchResults((searchResults) => [
+            ...searchResults,
+            ...data.Search,
+          ]);
           setHasError('');
         } catch (err) {
           if (err.name === 'AbortError') return; // Only handle non-abort errors
@@ -70,7 +74,7 @@ export function useLoadPages(query, callback, pages) {
     };
 
     if (query.length < 3) {
-      setMovies([]);
+      setSearchResults([]);
       setHasError('');
       return;
     }
@@ -85,5 +89,5 @@ export function useLoadPages(query, callback, pages) {
     };
   }, [query, pages]);
 
-  return { isLoading, hasError, movies, totalResults };
+  return { isLoading, hasError, searchResults, totalResults };
 }

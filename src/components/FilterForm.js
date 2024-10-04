@@ -1,67 +1,36 @@
 export const FilterForm = ({
+  list,
+  filters,
+  isOpen = false,
   onApplyFilters,
-  movies,
-  isFilterFormOpen,
-  year,
-  setYear,
-  type,
-  setType,
+  uniqueFilters,
 }) => {
-  // Get unique years and types from the movies array
-  const uniqueYears = [
-    ...new Set(movies.map((movie) => parseInt(movie.Year, 10))),
-  ].sort((a, b) => b - a);
-  const uniqueTypes = [...new Set(movies.map((movie) => movie.Type))]
-    .sort()
-    .reverse();
-
-  const handleSelectYear = (e) => {
-    setYear(e.target.value);
-    onApplyFilters({ Year: e.target.value, Type: type });
-  };
-
-  const handleSelectType = (e) => {
-    setType(e.target.value);
-    onApplyFilters({ Year: year, Type: e.target.value });
+  const handleSelect = (e) => {
+    onApplyFilters({ ...filters, [e.target.id]: e.target.value });
   };
 
   return (
-    <div className="modal-content">
-      {isFilterFormOpen ? (
+    <div className="filter-form-content">
+      {isOpen ? (
         <>
-          <div>
-            <select
-              id="year"
-              value={year}
-              onChange={handleSelectYear}
-            >
-              <option value="" selected disabled hidden>
-                Year
-              </option>
-              {uniqueYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
+          {Object.entries(uniqueFilters).map(([key, values]) => (
+            <div key={key}>
+              <select
+                id={key}
+                value={filters[key]}
+                onChange={handleSelect}
+              >
+                <option value="" disabled hidden>
+                  {key}
                 </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <select
-              id="type"
-              value={type}
-              onChange={handleSelectType}
-            >
-              {' '}
-              <option value="" selected disabled hidden>
-                Type
-              </option>
-              {uniqueTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
+                {uniqueFilters[key].map((key) => (
+                  <option key={key} value={key}>
+                    {key}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
         </>
       ) : null}
     </div>

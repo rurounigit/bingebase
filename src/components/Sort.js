@@ -47,7 +47,7 @@ export const Sort = ({
         className="btn-reverse"
         onClick={onReverse}
         isActive={isActive}
-        isReversed={isReversed}
+        toggleTextColor={isReversed}
       >
         {'\u21F5'}
       </Button>

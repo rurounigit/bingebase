@@ -44,7 +44,7 @@ export const WatchedSummary = ({
         <div>
           <p>
             <span>#️⃣</span>
-            <span>{watched.length} movies</span>
+            <span>{watched.length} searchResults</span>
           </p>
           <p>
             <span>⭐️</span>

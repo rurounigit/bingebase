@@ -4,7 +4,7 @@ import { KEY } from '../components/App';
 export function useMovies(query, callback) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState('');
-  const [movies, setMovies] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [totalResults, setTotalResults] = useState('');
 
   const callbackRef = useRef();
@@ -17,7 +17,7 @@ export function useMovies(query, callback) {
     callbackRef.current?.();
     const controller = new AbortController();
     const fetchMovies = async () => {
-      setMovies([]);
+      setSearchResults([]);
       try {
         setIsLoading(true);
         setHasError('');
@@ -34,7 +34,10 @@ export function useMovies(query, callback) {
           throw new Error('no results found.');
 
         setTotalResults(data.totalResults);
-        setMovies((movies) => [...movies, ...data.Search]);
+        setSearchResults((searchResults) => [
+          ...searchResults,
+          ...data.Search,
+        ]);
         setHasError('');
       } catch (err) {
         if (err.message === 'Failed to fetch') {
@@ -50,7 +53,7 @@ export function useMovies(query, callback) {
     };
 
     if (query.length < 3) {
-      setMovies([]);
+      setSearchResults([]);
       setHasError('');
       return;
     }
@@ -62,5 +65,5 @@ export function useMovies(query, callback) {
       clearTimeout(timer); // Clear timeout
     };
   }, [query]);
-  return { isLoading, hasError, movies, totalResults };
+  return { isLoading, hasError, searchResults, totalResults };
 }
