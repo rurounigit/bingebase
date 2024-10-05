@@ -87,36 +87,42 @@ export const MovieDetails = ({
 
   useKey('Escape', onCloseMovie);
 
-  const fetchMovieData = async (url) => {
-    const res = await fetch(url);
-    if (!res || !res.ok)
-      throw new Error("couldn't load movies details.");
-    const data = await res.json();
-    if (data.Response === 'False') throw new Error('no results found.');
-    return data;
-  };
-
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
         setIsLoadingDetails(true);
         setDetailError('');
-
-        const data = await fetchMovieData(
+        let res = await fetch(
           `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}`
         );
-        const data2 = await fetchMovieData(
+
+        if (!res || !res.ok)
+          throw new Error("couldn't load movies details.");
+
+        const data = await res.json();
+
+        if (data.Response === 'False')
+          throw new Error('no results found.');
+
+        res = await fetch(
           `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}&plot=full`
         );
 
+        if (!res || !res.ok)
+          throw new Error("couldn't load movies details.");
+
+        const data2 = await res.json();
+
+        if (data2.Response === 'False')
+          throw new Error('no results found.');
+
         setMovie({ ...data, Plotfull: data2.Plot });
       } catch (err) {
-        if (err.name === 'AbortError') return;
-        setDetailError(
-          err.message === 'Failed to fetch'
-            ? "Could not connect to the movie database. Please check your internet connection."
-            : err.message
-        );
+        if (err.message === 'Failed to fetch') {
+          setDetailError("couldn't load movie details.");
+        } else {
+          setDetailError(err.message);
+        }
       } finally {
         setIsLoadingDetails(false);
       }
