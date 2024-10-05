@@ -40,13 +40,12 @@ export function useMovies(query, callback) {
         ]);
         setHasError('');
       } catch (err) {
-        if (err.message === 'Failed to fetch') {
-          setHasError("couldn't load movies.");
-        } else {
-          if (err.message !== 'AbortError') {
-            setHasError(err.message);
-          }
-        }
+        if (err.name === 'AbortError') return;
+        setHasError(
+          err.message === 'Failed to fetch'
+            ? "Could not connect to the movie database. Please check your internet connection."
+            : err.message
+        );
       } finally {
         setIsLoading(false);
       }
