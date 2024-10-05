@@ -3,7 +3,6 @@ import { Navbar } from './Navbar';
 import { Main } from './Main';
 import { Search } from './Search';
 import { NumResults } from './NumResults';
-import { NumResultsWatchlist } from './NumResultsWatchlist';
 import { Box } from './Box';
 import { MovieList } from './MovieList';
 import { WatchedSummary } from './WatchedSummary';
@@ -19,6 +18,8 @@ import { FilterSVG } from './FilterSVG';
 import { Pages } from './Pages';
 import { Sort } from './Sort';
 import { FilterForm } from './FilterForm';
+import { OpenFiltersButton } from './OpenFiltersButton';
+import { FilterTags } from './FilterTags';
 
 export const KEY = '329428ec';
 
@@ -66,7 +67,7 @@ export default function App() {
   const [yearWatched, setYearWatched] = useState('');
   const [typeWatched, setTypeWatched] = useState('');
 
-  const [hasMouseEnteredBox, setHasMouseEnteredBox] = useState(false);
+  /* const [hasMouseEnteredBox, setHasMouseEnteredBox] = useState(false); */
   const isActive = query.length < 3 ? false : true;
   const isActiveWatchlist = watched.length > 0 && !selectedID;
   const sortOptions = [
@@ -113,14 +114,6 @@ export default function App() {
         .sort()
         .reverse(),
     },
-  };
-
-  const handleMouseEnterBox = () => {
-    setHasMouseEnteredBox(true);
-  };
-
-  const handleMouseLeaveBox = () => {
-    setHasMouseEnteredBox(false);
   };
 
   const handleToggleFilterFormWatched = () => {
@@ -603,15 +596,11 @@ export default function App() {
       </Navbar>
       <FilterSortBar>
         <FilterSortBox>
-          <Button
-            className={'btn-filter-form-toggle'}
-            isClicked={isFilterFormOpen}
+          <OpenFiltersButton
             isActive={isActive}
-            onClick={handleToggleFilterForm}
-            toggleOutline={isFilterFormOpen}
-          >
-            <FilterSVG />
-          </Button>
+            isFilterFormOpen={isFilterFormOpen}
+            handleToggleFilterForm={handleToggleFilterForm}
+          />
           <Pages
             isActive={isActive}
             pages={pages}
@@ -619,20 +608,10 @@ export default function App() {
             onRemovePage={handleRemovePage}
             onAddPage={handleAddPage}
           />
-
-          {Object.keys(filters).map(
-            (key) =>
-              filters[key] && (
-                <Button
-                  key={key}
-                  className="btn-filter-tag"
-                  onClick={() => handleRemoveFilter(key)}
-                >
-                  {filters[key]} &times;
-                </Button>
-              )
-          )}
-
+          <FilterTags
+            filters={filters}
+            handleRemoveFilter={handleRemoveFilter}
+          />
           <Sort
             isActive={isActive}
             onReverse={handleReverse}
@@ -643,29 +622,15 @@ export default function App() {
         </FilterSortBox>
 
         <FilterSortBox>
-          <Button
-            className={'btn-filter-form-toggle'}
-            isClicked={isFilterFormWatchedOpen}
+          <OpenFiltersButton
             isActive={isActiveWatchlist}
-            onClick={handleToggleFilterFormWatched}
-            toggleOutline={isFilterFormWatchedOpen}
-          >
-            <FilterSVG />
-          </Button>
-
-          {Object.keys(filtersWatched).map(
-            (key) =>
-              filtersWatched[key] && (
-                <Button
-                  key={key}
-                  className="btn-filter-tag"
-                  onClick={() => handleRemoveFilterWatched(key)}
-                >
-                  {filtersWatched[key]} &times;
-                </Button>
-              )
-          )}
-
+            isFilterFormOpen={isFilterFormWatchedOpen}
+            handleToggleFilterForm={handleToggleFilterFormWatched}
+          />
+          <FilterTags
+            filters={filtersWatched}
+            handleRemoveFilter={handleRemoveFilterWatched}
+          />
           <Sort
             isActive={isActiveWatchlist}
             onReverse={handleReverseWatchlist}
@@ -722,11 +687,7 @@ export default function App() {
               onCloseMovie={handleCloseMovie}
               onAddMovie={handleAddMovie}
               onDeleteMovie={handleDeleteMovie}
-              hasMouseEnteredBox={hasMouseEnteredBox}
               watched={watched}
-              key={selectedID}
-              onMouseEnterBox={handleMouseEnterBox}
-              onMouseLeaveBox={handleMouseLeaveBox}
             />
           ) : (
             <>
@@ -734,9 +695,7 @@ export default function App() {
                 watched={watched}
                 isFilterFormWatchedOpen={isFilterFormWatchedOpen}
               />
-              <NumResultsWatchlist
-                searchResults={watchedFiltered}
-                totalResults={watched.length}
+              <NumResults
                 isActive={isActiveWatchlist}
                 isFilterFormOpen={isFilterFormWatchedOpen}
                 topOpen={'11.8rem'}
@@ -744,7 +703,7 @@ export default function App() {
               >
                 showing <strong>{watchedFiltered.length}</strong> of{' '}
                 <strong>{watched.length}</strong> results
-              </NumResultsWatchlist>
+              </NumResults>
               <WatchedMoviesList
                 watched={watchedFiltered}
                 onSelectMovie={handleSelectMovie}
