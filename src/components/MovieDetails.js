@@ -13,20 +13,21 @@ export const MovieDetails = ({
   onCloseMovie,
   onAddMovie,
   onDeleteMovie,
-  watched,
+  initialWatched,
 }) => {
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [detailError, setDetailError] = useState('');
   const [movie, setMovie] = useState({});
   const { Title, imdbRating } = movie;
 
-  const savedRating = watched.find(
+  const savedRating = initialWatched.find(
     (movie) => movie.imdbID === selectedID
   )?.userRating
-    ? watched.find((movie) => movie.imdbID === selectedID)?.userRating
+    ? initialWatched.find((movie) => movie.imdbID === selectedID)
+        ?.userRating
     : 0;
 
-  const isWatched = watched.some(
+  const isWatched = initialWatched.some(
     (watchedMovie) => watchedMovie.imdbID === movie.imdbID
   );
 

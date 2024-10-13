@@ -4,15 +4,15 @@ import { Button } from './Button';
 export const Sort = ({
   isActive,
   onReverse,
-  onSortResults,
   isReversed,
   options = [{ value: 'value', label: 'Value' }],
+  setSortBy,
 }) => {
   const [value, setValue] = useState(options[0].value);
 
   const handleSelect = (e) => {
     setValue(e.target.value);
-    onSortResults(e);
+    setSortBy(e.target.value);
   };
 
   return (

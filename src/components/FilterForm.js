@@ -13,21 +13,23 @@ export const FilterForm = ({
     <div className="filter-form-content">
       {isOpen ? (
         <>
-          {Object.entries(uniqueFilters).map(([key, values]) => (
+          {Object.keys(uniqueFilters).map((key) => (
             <div key={key}>
               <select
                 id={key}
                 value={filters[key]}
                 onChange={handleSelect}
               >
-                <option value="" disabled hidden>
-                  {key}
-                </option>
-                {uniqueFilters[key].map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
+                <option value="">{key}</option>
+                {uniqueFilters[key].map(
+                  (
+                    value // Use uniqueFilters[key] to access the values array
+                  ) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  )
+                )}
               </select>
             </div>
           ))}

@@ -95,7 +95,7 @@ body {
   border: none;
 }
 
-.pages input:focus {
+/* .pages input:focus {
   border: none;
   outline: var(--color-text) solid 2px;
 }
@@ -103,7 +103,7 @@ body {
 .pages input:active {
   border: none;
   outline: var(--color-text) solid 2px;
-}
+} */
 
 .sort select {
   height: 2.2rem;

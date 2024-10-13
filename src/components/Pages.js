@@ -4,14 +4,30 @@ export const Pages = ({
   isActive,
   pages,
   setPages,
-  onRemovePage,
-  onAddPage,
+  onPageChange,
+  totalResults,
 }) => {
-  const handleChangePage = (e) => {
-    setPages((pages) => ({
+  const handleAddPage = () => {
+    const newPages = {
+      ...pages,
       previous: Number(pages.current),
-      current: e.target.value < 1 ? 1 : +e.target.value,
-    }));
+      current:
+        Number(pages.current) <= Math.trunc(totalResults / 10)
+          ? Number(pages.current) + 1
+          : Number(pages.current),
+    };
+    setPages(newPages);
+    onPageChange(newPages);
+  };
+
+  const handleRemovePage = () => {
+    const newPages = {
+      ...pages,
+      previous: Number(pages.current),
+      current: Number(pages.current) <= 1 ? 1 : +pages.current - 1,
+    };
+    setPages(newPages);
+    onPageChange(newPages);
   };
 
   return (
@@ -28,24 +44,24 @@ export const Pages = ({
       <Button
         className={'btn-add-page'}
         isActive={isActive}
-        onClick={onRemovePage}
+        onClick={handleRemovePage}
       >
         –
       </Button>
       <input
         id="pages"
-        disabled={!isActive}
+        disabled={true}
         value={pages.current}
-        onChange={handleChangePage}
+        /* onChange={handleChangePage} */
         style={{
           opacity: !isActive ? '0.3' : '1',
-          cursor: !isActive ? 'default' : 'pointer',
+          cursor: 'default',
         }}
       />
       <Button
         className={'btn-add-page'}
         isActive={isActive}
-        onClick={onAddPage}
+        onClick={handleAddPage}
       >
         +
       </Button>

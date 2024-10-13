@@ -1,6 +1,6 @@
 import { Button } from './Button';
 
-export const FilterTags = ({ filters, handleRemoveFilter }) => (
+export const FilterTags = ({ filters, handleRemoveFilters }) => (
   <>
     {Object.keys(filters).map(
       (key) =>
@@ -8,7 +8,7 @@ export const FilterTags = ({ filters, handleRemoveFilter }) => (
           <Button
             key={key}
             className="btn-filter-tag"
-            onClick={() => handleRemoveFilter(key)}
+            onClick={() => handleRemoveFilters(key)}
           >
             {filters[key]} &times;
           </Button>

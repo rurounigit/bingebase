@@ -28,19 +28,19 @@ export const WatchedMoviesList = ({
           <div>
             <p>
               <span>⭐️</span>
-              <span>{movie.imdbRating}</span>
+              <span>
+                {movie.imdbRating <= 0 ? '–' : movie.imdbRating}
+              </span>
             </p>
             <p>
               <span>🌟</span>
               <span>
-                {movie.userRating === 0
-                  ? 'no user rating'
-                  : movie.userRating}
+                {movie.userRating <= 0 ? '–' : movie.userRating}
               </span>
             </p>
             <p>
               <span>⏳</span>
-              <span>{movie.Runtime}</span>
+              <span>{movie.Runtime <= 0 ? '–' : movie.Runtime}</span>
             </p>
             <p>
               <span style={{ opacity: '0.3' }}>🗓️</span>

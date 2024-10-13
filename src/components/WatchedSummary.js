@@ -1,6 +1,6 @@
 export const WatchedSummary = ({
   watched,
-  isFilterFormWatchedOpen,
+  isFilterFormOpenWatched,
 }) => {
   const average = (arr) =>
     arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -9,9 +9,12 @@ export const WatchedSummary = ({
   const moviesWithRuntime = watched.filter(
     (movie) => movie.Runtime !== 'N/A'
   );
+  const moviesWithImdbRating = watched.filter(
+    (movie) => movie.imdbRating !== 'N/A'
+  );
 
   const avgImdbRating = average(
-    watched.map((movie) => movie.imdbRating)
+    moviesWithImdbRating.map((movie) => movie.imdbRating)
   ).toFixed(1);
 
   const avgUserRating =
@@ -31,7 +34,7 @@ export const WatchedSummary = ({
     <div
       style={{
         position: 'sticky',
-        top: isFilterFormWatchedOpen ? '4.4rem' : '2.2rem',
+        top: isFilterFormOpenWatched ? '4.4rem' : '2.2rem',
 
         /*  padding: '1.4rem 3.2rem 1.4rem 3.2rem', */
         backgroundColor: 'var(--color-background-500',
@@ -40,23 +43,23 @@ export const WatchedSummary = ({
       }}
     >
       <div className="summary">
-        <h2>Watchlist</h2>
+        <h2>Watched</h2>
         <div>
           <p>
             <span>#️⃣</span>
-            <span>{watched.length} searchResults</span>
+            <span>{watched.length <= 0 ? '–' : watched.length}</span>
           </p>
           <p>
             <span>⭐️</span>
-            <span>{avgImdbRating}</span>
+            <span>{avgImdbRating <= 0 ? '–' : avgImdbRating}</span>
           </p>
           <p>
             <span>🌟</span>
-            <span>{avgUserRating}</span>
+            <span>{avgUserRating <= 0 ? '–' : avgUserRating}</span>
           </p>
           <p>
             <span>⏳</span>
-            <span>{avgRuntime} min</span>
+            <span>{avgRuntime <= 0 ? '–' : avgRuntime}</span>
           </p>
         </div>
       </div>
