@@ -34,12 +34,12 @@ export const WatchedSummary = ({
     <div
       style={{
         position: 'sticky',
-        top: isFilterFormOpenWatched ? '4.4rem' : '2.2rem',
+        top: isFilterFormOpenWatched ? '4.4rem' : '0rem',
 
         /*  padding: '1.4rem 3.2rem 1.4rem 3.2rem', */
         backgroundColor: 'var(--color-background-500',
         borderRadius: '0.0',
-        zIndex: '999',
+        zIndex: '998',
       }}
     >
       <div className="summary">

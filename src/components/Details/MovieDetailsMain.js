@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from './Button';
-import { StarRating } from './StarRating';
+import { Button } from '../common/Button';
+import { StarRating } from '../Watched/StarRating';
 
 export const MovieDetailsMain = ({
   movie,

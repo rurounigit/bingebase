@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import { KEY } from './App';
-import { StarRating } from './StarRating';
-import { Loader } from './Loader';
-import { ErrorMessage } from './ErrorMessage';
-import { useKey } from '../hooks/useKey';
-import { Button } from './Button';
+import { KEY } from '../App/App';
+import { Loader } from '../common/Loader';
+import { ErrorMessage } from '../common/ErrorMessage';
+import { useKey } from '../../hooks/useKey';
 import { MovieDetailHeader } from './MovieDetailHeader';
 import { MovieDetailsMain } from './MovieDetailsMain';
 
@@ -33,6 +31,7 @@ export const MovieDetails = ({
 
   useKey('Escape', onCloseMovie);
 
+  // fetch movie details on selection
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
@@ -77,6 +76,7 @@ export const MovieDetails = ({
     fetchMovieDetails();
   }, [selectedID]);
 
+  // update page titel in browser
   useEffect(() => {
     if (!Title) return;
     document.title = `${Title} | ${
@@ -86,13 +86,16 @@ export const MovieDetails = ({
   }, [Title, savedRating, imdbRating, selectedID]);
 
   return (
-    <div className="details">
+    <div className="details header-wrapper">
       {isLoadingDetails ? (
         <Loader />
       ) : detailError ? (
         <ErrorMessage message={detailError} />
       ) : (
         <>
+          <button className="btn-back" onClick={onCloseMovie}>
+            &larr;
+          </button>
           <MovieDetailHeader
             movie={movie}
             onCloseMovie={onCloseMovie}

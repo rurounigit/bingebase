@@ -63,7 +63,7 @@ body {
   display: flex;
   align-items: center;
   width: calc(50% - 1rem);
-  max-width: calc(50% - 1rem);
+ /*  max-width: calc(50% - 1rem); */
 }
 
 .sort {
@@ -78,7 +78,6 @@ body {
 .pages {
   display: flex;
   align-items: center;
-  /* margin-left: auto; */
   padding-right: 0.8rem;
   font-size: 1.4rem;
   color: var(--color-text-dark);
@@ -94,16 +93,6 @@ body {
   font-weight: bold;
   border: none;
 }
-
-/* .pages input:focus {
-  border: none;
-  outline: var(--color-text) solid 2px;
-}
-
-.pages input:active {
-  border: none;
-  outline: var(--color-text) solid 2px;
-} */
 
 .sort select {
   height: 2.2rem;
@@ -203,19 +192,38 @@ body {
 }
 
 .btn-toggle-box {
-  position: absolute;
-  top: 0.8rem;
-  right: 0.8rem;
-  height: 2.4rem;
+  margin-top:0.1rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   aspect-ratio: 1;
-  border-radius: 50%;
+ /*  border-radius: 50%; */
   border: none;
-  background-color: var(--color-background-900);
+   background-color: var(--color-background-500);
   color: var(--color-text);
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: bold;
   cursor: pointer;
   z-index: 999;
+
+
+}
+
+
+.box.header-wrapper:hover .btn-toggle-box {
+  opacity: 0.3;
+}
+
+.header-wrapper:hover > .hidden-overlay {
+  opacity: 1;
+}
+
+
+
+.btn-toggle-box {
+  opacity: 0;
+  transition: opacity 0.3s ease; /* Optional for smooth transition */
 }
 
 .btn-add-page {
@@ -233,7 +241,7 @@ body {
   font-size: 1.4rem;
   font-weight: bold;
 
-  z-index: 999;
+  z-index: 2;
 }
 
 .btn-add-page:active {
@@ -340,7 +348,7 @@ body {
   background-color: var(--color-background-100);
   /* box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.01); */
   margin-bottom: 0rem;
-  z-index: 999;
+  z-index: 1;
 }
 
 .summary h2 {
@@ -373,6 +381,12 @@ body {
 .details header {
   display: flex;
   background-color: var(--color-background-100);
+
+
+}
+
+.details header {  /* Or add a class to the header content div */
+  position: relative; /* Key change */
 }
 
 .details section {
@@ -464,23 +478,13 @@ body {
   font-size: 1.4rem;
   font-weight: bold;
   cursor: pointer;
-  z-index: 997;
+  z-index: 1;
   margin-right: 0.9rem;
   transition: all 0.3s;
 }
 
 .btn-delete-big:hover {
   background-color: var(--color-red-dark);
-}
-
-.seconds {
-  background-color: var(--color-background-100);
-  width: 8rem;
-  border-radius: 10rem;
-  font-weight: 600;
-  text-align: center;
-  padding: 0.4rem;
-  margin-top: 2.4rem;
 }
 
 .btn-back {
@@ -500,7 +504,7 @@ body {
   font-size: 2.4rem;
   font-weight: bold;
   cursor: pointer;
-  z-index: 999;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,6 +515,16 @@ body {
 .btn-back:hover {
   background-color: var(--color-text-dark);
 }
+
+.details.header-wrapper:hover .btn-back {
+  opacity: 1;
+}
+
+.btn-back {
+  opacity: 0;
+  transition: opacity 0.3s ease; /* Optional for smooth transition */
+}
+
 
 .btn-filter-form-toggle {
   background-color: var(--color-primary);
@@ -527,13 +541,13 @@ body {
 
 .btn-filter-tag {
   height: 2.2rem;
-  width: 6rem;
+  width: auto;
   background-color: var(--color-red);
   color: var(--color-text);
   border: none;
   border-radius: 0.9rem;
   font-size: 1.4rem;
-  padding: 0.1rem 0.3rem 0.1rem 0.3rem;
+  padding: 0.1rem 0.7rem 0.1rem 0.7rem;
   margin-right: 1rem;
   font-weight: normal;
   cursor: pointer;
@@ -564,7 +578,8 @@ body {
   border-radius: 0.9rem 0.9rem 0rem 0rem;
   box-shadow: 0 1.4rem 1.4rem rgba(0, 0, 0, 0.1);
   padding: 1rem;
-  z-index: 999;
+  z-index: 998;
+
 }
 
 .filter-form-content h2 {
@@ -620,3 +635,5 @@ body {
 .filter-form-content button:hover {
   background-color: var(--color-primary);
 }
+
+

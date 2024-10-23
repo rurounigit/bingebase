@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { NegativeSVG } from './NegativeSVG';
-import { PositiveSVG } from './PositiveSVG';
+/* import { useState } from 'react'; */
+import { NegativeSVG } from '../common/NegativeSVG';
+import { PositiveSVG } from '../common/PositiveSVG';
 
 export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
-  const [isMouseOverHeader, setIsMouseOverHeader] = useState(false);
+  /* const [isMouseOverHeader, setIsMouseOverHeader] = useState(false); */
   const {
     Title,
     Released,
@@ -18,9 +18,9 @@ export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
     Type,
   } = movie;
 
-  const handleMouseOverHeader = () => {
+  /* const handleMouseOverHeader = () => {
     setIsMouseOverHeader((isOver) => !isOver);
-  };
+  }; */
 
   const addDefaultImg = (e) => {
     e.target.src = 'default-poster.svg';
@@ -53,16 +53,21 @@ export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
 
   return (
     <header
-      onMouseEnter={handleMouseOverHeader}
-      onMouseLeave={handleMouseOverHeader}
+      className="header-wrapper"
+      /*  onMouseEnter={handleMouseOverHeader}
+      onMouseLeave={handleMouseOverHeader} */
     >
-      <button
+      {/*  <button
         className="btn-back"
         onClick={onCloseMovie}
         style={{ opacity: isMouseOverHeader ? '1' : '0' }}
       >
         &larr;
-      </button>
+      </button> */}
+
+      {/* <button className="btn-back" onClick={onCloseMovie}>
+        &larr;
+      </button> */}
 
       <img
         src={Poster}
