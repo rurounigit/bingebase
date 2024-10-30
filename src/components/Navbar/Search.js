@@ -10,7 +10,7 @@ export const Search = ({
 
   return (
     <input
-      className="search"
+      className="search-navbar"
       type="text"
       placeholder="Search movies..."
       value={query}

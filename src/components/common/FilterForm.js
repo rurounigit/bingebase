@@ -1,3 +1,4 @@
+import { MultiSelectWrapper } from './MultiSelectWrapper';
 export const FilterForm = ({
   list,
   filters,
@@ -5,9 +6,9 @@ export const FilterForm = ({
   onApplyFilters,
   uniqueFilters,
 }) => {
-  const handleSelect = (e) => {
+  /* const handleSelect = (e) => {
     onApplyFilters({ ...filters, [e.target.id]: e.target.value });
-  };
+  }; */
 
   return (
     <div
@@ -35,21 +36,29 @@ export const FilterForm = ({
               (
                 [key, values] // Use destructuring here
               ) => (
-                <div key={key}>
-                  <select
-                    id={key}
-                    value={filters[key] ? filters[key] : key}
-                    onChange={handleSelect}
-                  >
-                    <option value="">{key}</option>{' '}
-                    {values.map((item) => (
-                      <option key={item.value} value={item.value}>
-                        {item.value}{' '}
-                        {item.count > 1 ? `(${item.count})` : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                /* key !== 'Actors' && key !== 'Genre' ? (
+                  <div key={key}>
+                    <select
+                      id={key}
+                      value={filters[key] ? filters[key] : key}
+                      onChange={handleSelect}
+                    >
+                      <option value="">{key}</option>{' '}
+                      {values.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.value}{' '}
+                          {item.count > 1 ? `(${item.count})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : */ <MultiSelectWrapper
+                  key={key}
+                  id={key}
+                  filters={filters}
+                  onApplyFilters={onApplyFilters}
+                  options={values}
+                />
               )
             )}
         </>

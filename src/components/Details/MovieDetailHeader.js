@@ -3,7 +3,6 @@ import { NegativeSVG } from '../common/NegativeSVG';
 import { PositiveSVG } from '../common/PositiveSVG';
 
 export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
-  /* const [isMouseOverHeader, setIsMouseOverHeader] = useState(false); */
   const {
     Title,
     Released,
@@ -17,10 +16,6 @@ export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
     Awards,
     Type,
   } = movie;
-
-  /* const handleMouseOverHeader = () => {
-    setIsMouseOverHeader((isOver) => !isOver);
-  }; */
 
   const addDefaultImg = (e) => {
     e.target.src = 'default-poster.svg';
@@ -52,23 +47,7 @@ export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
   };
 
   return (
-    <header
-      className="header-wrapper"
-      /*  onMouseEnter={handleMouseOverHeader}
-      onMouseLeave={handleMouseOverHeader} */
-    >
-      {/*  <button
-        className="btn-back"
-        onClick={onCloseMovie}
-        style={{ opacity: isMouseOverHeader ? '1' : '0' }}
-      >
-        &larr;
-      </button> */}
-
-      {/* <button className="btn-back" onClick={onCloseMovie}>
-        &larr;
-      </button> */}
-
+    <header className="header-wrapper">
       <img
         src={Poster}
         alt={Title}

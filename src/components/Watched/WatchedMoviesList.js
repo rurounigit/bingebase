@@ -1,7 +1,10 @@
+import { WatchedMoviesListProps } from './WatchedMoviesListProps'; // Import the separated component
+
 export const WatchedMoviesList = ({
   watched,
   onSelectMovie,
   onDeleteMovie,
+  sortByWatched,
 }) => {
   const handleDeleteMovie = (e, movieID) => {
     onDeleteMovie(movieID);
@@ -11,6 +14,46 @@ export const WatchedMoviesList = ({
   const addDefaultImg = (e) => {
     e.target.src = 'default-poster.png';
   };
+
+  const watchedShownProps = watched.reduce((acc, movie) => {
+    acc[movie.imdbID] = [
+      {
+        icon: '⭐️',
+        label: 'imdbRating',
+        value: movie.imdbRating <= 0 ? 'N/A' : movie.imdbRating,
+        imdbVotes: movie.imdbVotes ? ` (${movie.imdbVotes})` : '',
+      },
+      {
+        icon: '🌟',
+        label: 'userRating',
+        value: movie.userRating <= 0 ? 'N/A' : movie.userRating,
+      },
+      {
+        icon: '🍅',
+        label: 'rtRating',
+        value: movie.rtRating <= 0 ? 'N/A' : movie.rtRating,
+      },
+      { icon: '🗓', label: 'Year', value: movie.Year },
+      {
+        icon: '⏳',
+        label: 'Runtime',
+        value: movie.Runtime <= 0 ? 'N/A' : movie.Runtime, // Handle N/A and <= 0
+      },
+      {
+        icon:
+          movie.Type === 'movie'
+            ? '🎬'
+            : movie.Type === 'series'
+            ? '📺'
+            : movie.Type === 'game'
+            ? '🎮'
+            : '',
+        label: 'Type',
+        value: movie.Type, // Include the Type value
+      },
+    ];
+    return acc;
+  }, {});
 
   return (
     <ul className="list list-watched">
@@ -22,47 +65,26 @@ export const WatchedMoviesList = ({
           <img
             src={movie.Poster}
             alt={`${movie.Title} poster`}
-            onError={(e) => addDefaultImg(e)}
+            onError={addDefaultImg}
           />
-          <h2>{movie.Title}</h2>
+          <h2>
+            {movie.Title}{' '}
+            <span style={{ opacity: '0.3', fontSize: '1.2rem' }}>
+              ({movie.imdbID})
+            </span>
+          </h2>
           <div>
-            <p>
-              <span>⭐️</span>
-              <span>
-                {movie.imdbRating <= 0 ? '–' : movie.imdbRating}
-              </span>
-            </p>
-            <p>
-              <span>🌟</span>
-              <span>
-                {movie.userRating <= 0 ? '–' : movie.userRating}
-              </span>
-            </p>
-            <p>
-              <span>⏳</span>
-              <span>{movie.Runtime <= 0 ? '–' : movie.Runtime}</span>
-            </p>
-            <p>
-              <span style={{ opacity: '0.3' }}>🗓️</span>
-              <span style={{ opacity: '0.3' }}>{movie.Year}</span>
-            </p>
-            <p>
-              <span style={{ opacity: '0.3' }}>
-                {movie.Type === 'movie' && '🎬'}
-                {movie.Type === 'series' && '📺'}
-                {movie.Type === 'game' && '🎮'}
-              </span>
-            </p>
-            {watched.some(
-              (watchedMovie) => watchedMovie.imdbID === movie.imdbID
-            ) ? (
-              <button
-                className="btn-delete-big"
-                onClick={(e) => handleDeleteMovie(e, movie.imdbID)}
-              >
-                –
-              </button>
-            ) : null}
+            <WatchedMoviesListProps
+              movie={movie} // Pass the whole movie object
+              watchedShownProps={watchedShownProps}
+              sortByWatched={sortByWatched}
+            />
+            <button
+              className="btn-delete-big"
+              onClick={(e) => handleDeleteMovie(e, movie.imdbID)}
+            >
+              –
+            </button>
           </div>
         </li>
       ))}

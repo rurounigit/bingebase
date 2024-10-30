@@ -31,7 +31,7 @@ export const NumResults = ({
         display: 'flex',
         border: 'none',
         borderRadius: '0rem',
-        zIndex: 998, // No need for string '998'
+        zIndex: 2, // No need for string '998'
         backgroundColor: 'var(--color-background-500)',
       }}
     >

@@ -1,4 +1,4 @@
-import { Movie } from '../Details/Movie';
+import { Movie } from './Movie';
 
 export const MovieList = ({ searchResults, onSelectMovie }) => (
   <ul className="list list-movies">

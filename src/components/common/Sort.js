@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from './Button';
 
 export const Sort = ({
@@ -7,11 +6,9 @@ export const Sort = ({
   isReversed,
   options = [{ value: 'value', label: 'Value' }],
   setSortBy,
+  sortBy,
 }) => {
-  const [value, setValue] = useState(options[0].value);
-
   const handleSelect = (e) => {
-    setValue(e.target.value);
     setSortBy(e.target.value);
   };
 
@@ -29,7 +26,7 @@ export const Sort = ({
         <select
           id="sort"
           disabled={!isActive}
-          value={value}
+          value={sortBy}
           onChange={handleSelect}
           style={{
             opacity: !isActive ? '0.3' : '1',

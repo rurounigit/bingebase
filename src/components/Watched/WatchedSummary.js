@@ -37,9 +37,9 @@ export const WatchedSummary = ({
         top: isFilterFormOpenWatched ? '4.4rem' : '0rem',
 
         /*  padding: '1.4rem 3.2rem 1.4rem 3.2rem', */
-        backgroundColor: 'var(--color-background-500',
+        backgroundColor: 'var(--color-background-500)',
         borderRadius: '0.0',
-        zIndex: '998',
+        zIndex: '1',
       }}
     >
       <div className="summary">

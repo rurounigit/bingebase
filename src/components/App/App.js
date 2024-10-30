@@ -50,31 +50,6 @@ export default function App() {
   const isActive = query.length < 3 ? false : true;
   const isEmpty = searchResults.length === 0 && isActive;
 
-  /* const prepOptions = (setup) => {
-    const { list, prop, isMulti } = setup;
-    return (
-      isMulti
-        ? Object.entries(
-            list
-              .filter((movie) => movie?.[prop] !== 'N/A')
-              .flatMap((movie) => movie?.[prop].split(', '))
-              .reduce((propCounts, prop) => {
-                propCounts[prop] = (propCounts[prop] || 0) + 1;
-                return propCounts;
-              }, {})
-          ).sort(([, a], [, b]) => b - a)
-        : Object.entries(
-            list
-              .filter((movie) => movie?.[prop] !== 'N/A')
-              .map((movie) => movie?.[prop].split('–')[0])
-              .reduce((propCounts, prop) => {
-                propCounts[prop] = (propCounts[prop] || 0) + 1;
-                return propCounts;
-              }, {})
-          ).sort(([a], [b]) => b - a)
-    ).map(([prop, count]) => ({ value: prop, count }));
-  }; */
-
   const prepOptions = (setup) => {
     const { list, listForCount, prop, isMulti } = setup;
 
@@ -116,53 +91,6 @@ export default function App() {
 
     return entries.map(([value, count]) => ({ value, count }));
   };
-
-  /* const uniqueFilters = {
-    searchResults: {
-      Year: prepOptions({
-        list: initialSearchResults,
-        prop: 'Year',
-        isMulti: false,
-      }),
-      Type: prepOptions({
-        list: initialSearchResults,
-        prop: 'Type',
-        isMulti: false,
-      }),
-    },
-    watched: {
-      Year: prepOptions({
-        list: initialWatched,
-        prop: 'Year',
-        isMulti: false,
-      }),
-      Type: prepOptions({
-        list: initialWatched,
-        prop: 'Type',
-        isMulti: false,
-      }),
-      Genre: prepOptions({
-        list: initialWatched,
-        prop: 'Genre',
-        isMulti: true,
-      }),
-      Actors: prepOptions({
-        list: initialWatched,
-        prop: 'Actors',
-        isMulti: true,
-      }),
-      Director: prepOptions({
-        list: initialWatched,
-        prop: 'Director',
-        isMulti: false,
-      }),
-        Rated: prepOptions({
-        list: watched,
-        prop: 'Rated',
-        isMulti: false,
-      }),
-    },
-  }; */
 
   const uniqueFilters = {
     searchResults: {
@@ -244,29 +172,31 @@ export default function App() {
 
   const sortOptionsWatched = [
     { value: 'As added', label: 'As added', icon: '⤵️' },
-    { value: 'Title', label: 'Title', icon: '#️⃣' },
+    { value: 'imdbRating', label: 'IMdb Rating', icon: '⭐️' },
+    { value: 'userRating', label: 'User Rating', icon: '🌟' },
+    { value: 'rtRating', label: 'Rotten Tomatoes', icon: '🍅' },
     { value: 'Year', label: 'Year', icon: '🗓️' },
     { value: 'Type', label: 'Type', icon: '🎬' },
-    { value: 'imdbRating', label: 'imdb', icon: '⭐️' },
-    { value: 'userRating', label: 'user', icon: '🌟' },
+    { value: 'Title', label: 'Title', icon: '#️⃣' },
   ].filter((option) => filtersWatched[option.value] === undefined);
 
-  console.log('filters:', JSON.stringify(filters, null, 2));
-  console.log(
-    'uniqueFilters:',
-    JSON.stringify(uniqueFilters, null, 2)
-  );
-  console.log(
-    'filtersWatched:',
-    JSON.stringify(filtersWatched, null, 2)
-  );
-  console.log('expanded:', JSON.stringify(expanded, null, 2));
+  console.log(JSON.stringify(sortOptionsWatched));
 
   const filter = (list, filters) => {
     return list.filter((element) =>
       Object.entries(filters).every(([key, value]) => {
-        const elementValue = element[key]?.split('–')[0];
-        return elementValue && elementValue.includes(value);
+        const elementValue = element[key];
+
+        if (Array.isArray(value)) {
+          // Handle multi-value filters (e.g., Genre, Actors)
+          return value.every((filterValue) => {
+            // Check if EVERY filter value is present
+            return elementValue && elementValue.includes(filterValue);
+          });
+        } else {
+          // Handle single-value filters (e.g., Year, Type)
+          return elementValue && elementValue.includes(value);
+        }
       })
     );
   };
@@ -277,6 +207,16 @@ export default function App() {
         return list.sort((a, b) => b[prop].localeCompare(a[prop]));
       case 'userRating':
         return list.sort((a, b) => b[prop] - a[prop]);
+      case 'rtRating':
+        return [...list].sort((a, b) => {
+          const aRating = Number(
+            (a.rtRating || '').toString().replace(/%/g, '')
+          );
+          const bRating = Number(
+            (b.rtRating || '').toString().replace(/%/g, '')
+          );
+          return bRating - aRating;
+        });
       default:
         return list.sort((a, b) => b[prop].localeCompare(a[prop]));
     }
@@ -310,11 +250,24 @@ export default function App() {
     });
   };
 
-  const handleRemoveFilterWatched = (filterKey) => {
-    setFiltersWatched((prev) => {
-      const newFilters = { ...prev };
-      delete newFilters[filterKey];
-      return newFilters;
+  const handleRemoveFilterWatched = (key, valueToRemove) => {
+    setFiltersWatched((prevFilters) => {
+      const updatedFilters = { ...prevFilters };
+
+      if (valueToRemove !== undefined) {
+        // Check if valueToRemove is provided (meaning it's an array filter)
+        updatedFilters[key] = updatedFilters[key].filter(
+          (value) => value !== valueToRemove
+        );
+        if (updatedFilters[key].length === 0) {
+          // Remove the key if the array becomes empty
+          delete updatedFilters[key];
+        }
+      } else {
+        delete updatedFilters[key];
+      }
+
+      return updatedFilters;
     });
   };
 
@@ -327,6 +280,10 @@ export default function App() {
   };
 
   const handleAddMovie = (rating, movie) => {
+    const rtRating =
+      Number((movie.Ratings?.[1]?.Value || '').replace(/%/g, '')) ||
+      'N/A';
+
     const newMovie = {
       imdbID: movie.imdbID,
       Title: movie.Title,
@@ -335,7 +292,7 @@ export default function App() {
       Runtime: movie.Runtime,
       imdbRating: movie.imdbRating,
       userRating: rating,
-      rtRating: movie.rtRating,
+      rtRating: isNaN(rtRating) ? 'N/A' : rtRating, // Handle NaN
       Rated: movie.Rated,
       Type: movie.Type,
       Genre: movie.Genre,
@@ -451,7 +408,6 @@ export default function App() {
   // event handler to load more pages or remove pages from searchResults
   const handlePageChange = async (newPages) => {
     let n = 0;
-    console.log(`handlePageChange ${newPages}`);
     if (query.length === 0) {
       n = newPages.current;
     } else if (newPages.current < newPages.previous) {
@@ -572,6 +528,7 @@ export default function App() {
               isReversed={isReversed}
               options={sortOptions}
               setSortBy={setSortBy}
+              sortBy={sortBy}
             />
           </FilterSortBox>
         ) : null}
@@ -595,6 +552,7 @@ export default function App() {
               isReversed={isReversedWatched}
               options={sortOptionsWatched}
               setSortBy={setSortByWatched}
+              sortBy={sortByWatched}
             />
           </FilterSortBox>
         ) : null}
@@ -681,6 +639,7 @@ export default function App() {
                   watched={watched}
                   onSelectMovie={handleSelectMovie}
                   onDeleteMovie={handleDeleteMovie}
+                  sortByWatched={sortByWatched}
                 />
               </>
             )}
