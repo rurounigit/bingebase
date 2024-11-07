@@ -5,6 +5,7 @@ import { Search } from '../Navbar/Search';
 import { NumResults } from '../common/NumResults';
 import { Box } from '../common/Box';
 import { MovieList } from '../SearchResults/MovieList';
+import { MovieListTanstack } from '../SearchResults/MovieListTanstack';
 import { WatchedSummary } from '../Watched/WatchedSummary';
 import { WatchedMoviesList } from '../Watched/WatchedMoviesList';
 import { Loader } from '../common/Loader';
@@ -18,18 +19,98 @@ import { Sort } from '../common/Sort';
 import { FilterForm } from '../common/FilterForm';
 import { OpenFiltersButton } from '../common/OpenFiltersButton';
 import { FilterTags } from '../common/FilterTags';
+import { fetchMovies } from '../../services/omdbApi';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 export const KEY = '329428ec';
 
 export default function App() {
   const [query, setQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingLegacy, setIsLoadingLegacy] = useState(false);
   const [hasError, setHasError] = useState('');
   const [totalResults, setTotalResults] = useState(0);
   const [pages, setPages] = useState({ previous: 1, current: 1 });
   const [initialSearchResults, setInitialSearchResults] = useState(
     []
   );
+
+  const allPages = useRef([]);
+
+  const firstPage = useQuery({
+    queryKey: ['firstPage', query],
+    queryFn: () => fetchMovies(query),
+    enabled: query.length >= 3,
+    placeholderData: keepPreviousData,
+  });
+
+  const nextPage = useQuery({
+    queryKey: ['nextPage', query, pages.current],
+    queryFn: () => fetchMovies(query, pages.current),
+    enabled: query.length >= 3 && pages.current > 1,
+    placeholderData: keepPreviousData,
+  });
+
+  /* if (firstPage?.data?.Search && nextPage?.data?.Search) { */
+  if (firstPage.isSuccess && nextPage.isSuccess) {
+    if (pages.current > pages.previous) {
+      allPages.current = [
+        ...new Set([
+          ...allPages.current,
+          ...firstPage.data.Search,
+          ...nextPage.data.Search,
+        ]),
+      ];
+    } else {
+      console.log(
+        'allPages.current.length:' + allPages.current.length
+      );
+      if (allPages.current.length > pages.current * 10) {
+        allPages.current = [...allPages.current].slice(
+          0,
+          allPages.current.length -
+            (pages.previous - pages.current) * 10
+        );
+      }
+    }
+  }
+
+  /*   console.log(
+    'firstPage.data:',
+    JSON.stringify(firstPage.data, null, 2)
+  );
+  console.log(
+    'nextPage.data:',
+    JSON.stringify(nextPage.data, null, 2)
+  ); */
+  console.log(
+    'allPages.current:',
+    JSON.stringify(allPages.current, null, 2)
+  );
+
+  /* const {
+    isLoading,
+    isFetching,
+    isPending,
+    error,
+    data,
+    isPlaceholderData,
+  } = useQueries({
+    queries: [
+      {
+        queryKey: ['searchResults', query],
+        queryFn: () => fetchMovies(query),
+        enabled: query.length >= 3,
+        placeholderData: keepPreviousData,
+      },
+      {
+        queryKey: ['additionalPages', query, pages.current],
+        queryFn: () => fetchMovies(query, pages.current),
+        enabled: query.length >= 3 && pages.current > 1, // Only runs when main query is also enabled
+        placeholderData: keepPreviousData,
+      },
+    ],
+  }); */
+
   const [searchResults, setSearchResults] = useState([]);
   const [initialWatched, setInitialWatched] = useLocalStorage(
     [],
@@ -138,12 +219,6 @@ export default function App() {
         prop: 'Director',
         isMulti: false,
       }),
-      /*  Rated: prepOptions({
-        list: watched,
-        listForCount: initialWatched,
-        prop: 'Rated',
-        isMulti: false,
-      }), */
     },
   };
 
@@ -180,7 +255,7 @@ export default function App() {
     { value: 'Title', label: 'Title', icon: '#️⃣' },
   ].filter((option) => filtersWatched[option.value] === undefined);
 
-  console.log(JSON.stringify(sortOptionsWatched));
+  /* console.log(JSON.stringify(sortOptionsWatched)); */
 
   const filter = (list, filters) => {
     return list.filter((element) =>
@@ -204,7 +279,7 @@ export default function App() {
   const sort = (list, prop, initialList) => {
     switch (prop) {
       case 'Title':
-        return list.sort((a, b) => b[prop].localeCompare(a[prop]));
+        return list;
       case 'userRating':
         return list.sort((a, b) => b[prop] - a[prop]);
       case 'rtRating':
@@ -346,10 +421,10 @@ export default function App() {
     const controller = new AbortController();
     const fetchMovies = async () => {
       try {
-        setIsLoading(true);
+        setIsLoadingLegacy(true);
         setHasError('');
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}&page=1`,
           { signal: controller.signal }
         );
 
@@ -383,7 +458,7 @@ export default function App() {
           }
         }
       } finally {
-        setIsLoading(false);
+        setIsLoadingLegacy(false);
       }
     };
 
@@ -403,28 +478,51 @@ export default function App() {
       setPages({ previous: 1, current: 1 });
       setSearchResults([]);
       setInitialSearchResults([]);
+      setSortBy('Title');
+      allPages.current = [];
     };
   };
-  // event handler to load more pages or remove pages from searchResults
+
+  /*  setIsLoading(isLoading); */
+
+  // ... (Remove the cleanupRef and its related logic) ...
+
+  /*  // event handler to load more pages or remove pages
   const handlePageChange = async (newPages) => {
+    const current = newPages.current;
+    const previous = newPages.previous;
     let n = 0;
+
+    // query is empty, so the page doesn't change (loop below to fetch more data will not run)
     if (query.length === 0) {
-      n = newPages.current;
-    } else if (newPages.current < newPages.previous) {
-      n = newPages.current;
+      n = current;
+      // direction is remove page, so we remove the number of pages (a 10 items) that we went down
+      // (loop below to fetch more data will not run)
+    } else if (current < previous) {
+      n = current;
       const newSearchResults = (searchResults) =>
-        [...searchResults].slice(
+        [...initialSearchResults].slice(
           0,
-          searchResults.length -
-            (newPages.previous - newPages.current) * 10
+          initialSearchResults.length - (previous - current) * 10
         );
-      setSearchResults(newSearchResults);
+      // update initialSearchResults (for holding all results)
+      // searchResults (for holding the results after filtering and sorting)
+      // is updated by the useEffect further down)
       setInitialSearchResults(newSearchResults);
+      // direction is add page, so we set n to the previous page number and we
+      // loop through all pages from the previous page to the current page below
     } else {
-      n = newPages.previous;
+      n = previous;
+      if (current !== searchResults.length) {
+        n = 1;
+      }
+
     }
 
-    while (n < newPages.current) {
+
+    while (n < current) {
+      // the first page is already loaded in the other event handler for the Search component
+      // so we add 1 to the page number
       n++;
 
       try {
@@ -442,13 +540,35 @@ export default function App() {
         if (data.Response === 'False')
           throw new Error('No results found.');
 
+        // update totalResults
         setTotalResults(data.totalResults);
-        const newSearchResults = (searchResults) => [
-          ...searchResults,
-          ...data.Search,
+
+         // Filter out duplicate results based on imdbID
+        const newResults = data.Search.filter(
+          (newResult) =>
+            !initialSearchResults.some(
+              (existingResult) =>
+                existingResult.imdbID === newResult.imdbID
+            )
+        );
+
+
+
+          // add the new results/items to the already existing values in initialSearchResults
+        //const newSearchResults = (searchResults) => [
+        //  ...initialSearchResults,
+        //  ...data.Search,
+        //];
+
+        // Add the unique new results
+        const updatedSearchResults = [
+          ...initialSearchResults,
+          ...newResults,
         ];
-        setInitialSearchResults(newSearchResults);
-        setSearchResults(newSearchResults);
+
+        setInitialSearchResults(updatedSearchResults);
+
+        // setInitialSearchResults(newSearchResults);
 
         setHasError('');
       } catch (err) {
@@ -458,10 +578,87 @@ export default function App() {
         setIsLoading(false);
       }
     }
+  }; */
+
+  const handlePageChange = async (newPages) => {
+    const current = newPages.current;
+    const previous = newPages.previous;
+    let n = 0;
+
+    if (query.length === 0) {
+      n = current;
+    } else if (current < previous) {
+      n = current;
+      const newSearchResults = [...initialSearchResults].slice(
+        0,
+        initialSearchResults.length - (previous - current) * 10
+      );
+      setInitialSearchResults(newSearchResults);
+    } else {
+      n = previous;
+    }
+
+    let tempResults = [];
+
+    while (n < current) {
+      let currentTempResults = [...tempResults];
+      n++;
+
+      try {
+        setIsLoadingLegacy(true);
+        setHasError('');
+
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}&page=${n}`
+        );
+
+        if (!res.ok) throw new Error("Couldn't load movie details.");
+
+        const data = await res.json();
+
+        if (data.Response === 'False')
+          throw new Error('No results found.');
+
+        const newResults = data.Search.filter(
+          (newResult) =>
+            !currentTempResults.some(
+              (existingResult) =>
+                existingResult.imdbID === newResult.imdbID
+            )
+        );
+        tempResults = [...tempResults, ...newResults];
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        setHasError(err.message || "Couldn't load movies.");
+        //Important: break out of the loop on error
+        break;
+      } finally {
+        setIsLoadingLegacy(false);
+      }
+    } // End of the while loop
+
+    setInitialSearchResults((prevResults) => [
+      ...prevResults,
+      ...tempResults,
+    ]);
+
+    //Set TotalResults outside the loop
+    try {
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}&page=1`
+      );
+      if (!res.ok) throw new Error("Couldn't load movie details.");
+      const data = await res.json();
+      setTotalResults(data.totalResults);
+    } catch (error) {
+      console.error('Failed to fetch total results', error);
+    }
   };
+
   // handling filter, sort and invert/reverse order for searchResults
   useEffect(() => {
     setSearchResults((prevlist) => {
+      if (!initialSearchResults) return prevlist;
       let newList = filter(initialSearchResults, filters);
       newList = sort(newList, sortBy, initialSearchResults);
       if (isReversed) newList = [...newList].reverse();
@@ -469,6 +666,68 @@ export default function App() {
       return newList;
     });
   }, [filters, initialSearchResults, isReversed, sortBy]);
+
+  /*  let searchResultsTanstack = [];
+  if (allPages.current.length !== 0) {
+    searchResultsTanstack = isReversed
+      ? sort(
+          filter(allPages.current, filters),
+          sortBy,
+          allPages.current
+        )
+          .slice()
+          .reverse()
+      : sort(
+          filter(allPages.current, filters),
+          sortBy,
+          allPages.current
+        );
+  } else if (!firstPage.isPending) {
+    searchResultsTanstack = isReversed
+      ? sort(
+          filter(firstPage?.data?.Search, filters),
+          sortBy,
+          firstPage.data?.Search
+        )
+          .slice()
+          .reverse()
+      : sort(
+          filter(firstPage?.data?.Search, filters),
+          sortBy,
+          firstPage?.data?.Search
+        );
+  } */
+
+  /* let searchResultsTanstack = [];
+  const data =
+    allPages.current.length !== 0
+      ? allPages.current
+      : firstPage.isPending
+      ? []
+      : firstPage?.data?.Search;
+
+  if (data.length > 0) {
+    searchResultsTanstack = sort(filter(data, filters), sortBy, data);
+    if (isReversed) {
+      searchResultsTanstack.reverse();
+    }
+  } */
+
+  let searchResultsTanstack = [];
+  let data = [];
+
+  if (allPages.current.length !== 0) {
+    data = allPages.current;
+  } else if (!firstPage.isPending && firstPage?.data?.Search) {
+    data = firstPage?.data?.Search;
+  }
+
+  if (data.length > 0) {
+    searchResultsTanstack = sort(filter(data, filters), sortBy, data);
+    if (isReversed) {
+      searchResultsTanstack.reverse();
+    }
+  }
 
   // handling filter, sort and invert/reverse order for watchlistFiltered
   useEffect(() => {
@@ -560,44 +819,64 @@ export default function App() {
 
       <Main>
         {!expanded || expanded === 'searchResults' ? (
-          <Box
-            isActive={isActive}
-            boxWidth={expanded === 'searchResults' ? '100%' : '40%'}
-          >
-            <FilterForm
-              onApplyFilters={handleApplyFilters}
-              list={searchResults}
-              filters={filters}
-              isOpen={isFilterFormOpen}
-              uniqueFilters={uniqueFilters.searchResults}
-            />
-            <NumResults
+          <>
+            {/*  <Box
               isActive={isActive}
-              isFilterFormOpen={isFilterFormOpen}
-              topOpen={'4.4rem'}
-              topClosed={'0rem'}
-              expanded={expanded}
-              setExpanded={setExpanded}
-              content="searchResults"
+              boxWidth={expanded === 'searchResults' ? '100%' : '40%'}
             >
-              {' '}
-              showing <strong>{searchResults.length}</strong> of{' '}
-              <strong>{totalResults}</strong> results
-            </NumResults>
-
-            {isLoading ? (
-              <Loader />
-            ) : hasError ? (
-              <ErrorMessage message={hasError} />
-            ) : isEmpty ? (
-              <ErrorMessage message={'No results found.'} />
-            ) : (
-              <MovieList
-                searchResults={searchResults}
-                onSelectMovie={handleSelectMovie}
+              <FilterForm
+                onApplyFilters={handleApplyFilters}
+                list={searchResults}
+                filters={filters}
+                isOpen={isFilterFormOpen}
+                uniqueFilters={uniqueFilters.searchResults}
               />
-            )}
-          </Box>
+              <NumResults
+                isActive={isActive}
+                isFilterFormOpen={isFilterFormOpen}
+                topOpen={'4.4rem'}
+                topClosed={'0rem'}
+                expanded={expanded}
+                setExpanded={setExpanded}
+                content="searchResults"
+              >
+                {' '}
+                showing <strong>
+                  {searchResults.length}
+                </strong> of <strong>{totalResults}</strong> results
+              </NumResults>
+
+              {isLoadingLegacy ? (
+                <Loader />
+              ) : hasError ? (
+                <ErrorMessage message={hasError} />
+              ) : isEmpty ? (
+                <ErrorMessage message={'No results found.'} />
+              ) : (
+                <MovieList
+                  searchResults={searchResults}
+                  onSelectMovie={handleSelectMovie}
+                />
+              )}
+            </Box> */}
+            <Box
+              isActive={isActive}
+              boxWidth={expanded === 'searchResults' ? '100%' : '40%'}
+            >
+              <MovieListTanstack
+                isActive={isActive}
+                isFilterFormOpen={isFilterFormOpen}
+                expanded={expanded}
+                setExpanded={setExpanded}
+                firstPage={firstPage}
+                nextPage={nextPage}
+                handleSelectMovie={handleSelectMovie}
+                allPages={allPages.current}
+                searchResults={searchResultsTanstack}
+                query={query}
+              />
+            </Box>
+          </>
         ) : null}
         {!expanded || expanded === 'watched' ? (
           <Box boxWidth={expanded === 'watched' ? '100%' : '60%'}>

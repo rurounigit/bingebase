@@ -16,7 +16,7 @@ export const Search = ({
       value={query}
       onChange={(e) => {
         setQuery(e.target.value);
-        onSearchChange(e.target.value, pages);
+        onSearchChange(e.target.value);
       }}
       ref={inputEl}
       autoFocus={true}

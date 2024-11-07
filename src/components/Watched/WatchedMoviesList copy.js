@@ -121,7 +121,7 @@ export const WatchedMoviesListProps = ({
   const sortedBy = watchedShownProps[movieImdbID]
     .find((prop) => prop.label === sortByWatched)
     .filter((prop) => prop?.value !== 'N/A');
-  console.log(JSON.stringify(sortedBy, null, 2));
+  /* console.log(JSON.stringify(sortedBy, null, 2)); */
   return (
     <>
       {sortedBy?.icon} {sortedBy?.value} {sortedBy?.imdbVotes}

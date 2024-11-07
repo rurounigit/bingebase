@@ -5,6 +5,7 @@ export const Pages = ({
   pages,
   setPages,
   onPageChange,
+  /*  onAddPage, */
   totalResults,
 }) => {
   const handleAddPage = () => {
@@ -16,8 +17,11 @@ export const Pages = ({
           ? Number(pages.current) + 1
           : Number(pages.current),
     };
+
+    /* onPageChange(newPages); */
     setPages(newPages);
     onPageChange(newPages);
+    /* onAddPage(newPages); */
   };
 
   const handleRemovePage = () => {
@@ -52,7 +56,6 @@ export const Pages = ({
         id="pages"
         disabled={true}
         value={pages.current}
-        /* onChange={handleChangePage} */
         style={{
           opacity: !isActive ? '0.3' : '1',
           cursor: 'default',

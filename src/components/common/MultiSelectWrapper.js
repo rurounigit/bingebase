@@ -69,10 +69,10 @@ export const MultiSelectWrapper = ({
   }));
 
   /*  console.log(`${id} selected: ${JSON.stringify(selected)}`); */
-  console.log(`${id} options: ${JSON.stringify(options)}`);
+  /* console.log(`${id} options: ${JSON.stringify(options)}`);
   console.log(
     `${id} optionsFormatted: ${JSON.stringify(optionsFormatted)}`
-  ); // Log the formatted options
+  ); */ // Log the formatted options
 
   const handleChange = (selectedOptions) => {
     /*  setSelected(selectedOptions); */

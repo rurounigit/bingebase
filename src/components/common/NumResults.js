@@ -8,7 +8,10 @@ export const NumResults = ({
   content,
   children,
 }) => {
+  // true if this component instance (whith the given content) is expanded
   const isExpanded = expanded === content;
+  // if the content is watched, the direction is left to right,
+  // otherwise right to left
   const direction =
     content === 'watched'
       ? isExpanded
@@ -17,7 +20,7 @@ export const NumResults = ({
       : isExpanded
       ? 'RightToLeft'
       : 'LeftToRight';
-
+  // handleExpand is a function that sets the expanded state to the given content
   const handleExpand = () =>
     setExpanded((prev) => (prev === content ? '' : content));
 
