@@ -11,6 +11,7 @@ export const MultiSelectWrapper = ({
   id,
   filters,
   onApplyFilters,
+  setFilters,
   options,
 }) => {
   /*  console.log(`${id} filters: ${JSON.stringify(filters)}`); */
@@ -58,7 +59,7 @@ export const MultiSelectWrapper = ({
 
   // ... (customValueRenderer remains the same)
 
-  console.log(`${id} selected: ${JSON.stringify(selected)}`);
+  /* console.log(`${id} selected: ${JSON.stringify(selected)}`); */
 
   const optionsFormatted = options.map((option) => ({
     label:
@@ -79,7 +80,15 @@ export const MultiSelectWrapper = ({
     const selectedValues = selectedOptions.map(
       (option) => option.value
     );
-    onApplyFilters({ ...filters, [id]: selectedValues });
+    if (selectedValues.length === 0) {
+      setFilters((prev) => {
+        const newFilters = { ...prev };
+        delete newFilters[id];
+        return newFilters;
+      });
+    } else {
+      onApplyFilters({ ...filters, [id]: selectedValues });
+    }
   };
 
   const ArrowRenderer = ({ expanded }) => (
@@ -127,6 +136,7 @@ export const MultiSelectWrapper = ({
         hasSelectAll={false}
         valueRenderer={customValueRenderer}
         disableSearch={disableSearch}
+        closeOnChangedValue={true}
       />
     </div>
   );

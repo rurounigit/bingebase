@@ -5,6 +5,7 @@ export const FilterForm = ({
   isOpen = false,
   onApplyFilters,
   uniqueFilters,
+  setFilters,
 }) => {
   /* const handleSelect = (e) => {
     onApplyFilters({ ...filters, [e.target.id]: e.target.value });
@@ -58,6 +59,7 @@ export const FilterForm = ({
                   filters={filters}
                   onApplyFilters={onApplyFilters}
                   options={values}
+                  setFilters={setFilters}
                 />
               )
             )}

@@ -3,13 +3,13 @@ export const NumResults = ({
   topClosed,
   isActive = true,
   isFilterFormOpen,
-  expanded,
-  setExpanded,
+  expandedBox,
+  setExpandedBox,
   content,
   children,
 }) => {
   // true if this component instance (whith the given content) is expanded
-  const isExpanded = expanded === content;
+  const isExpanded = expandedBox === content;
   // if the content is watched, the direction is left to right,
   // otherwise right to left
   const direction =
@@ -22,7 +22,7 @@ export const NumResults = ({
       : 'LeftToRight';
   // handleExpand is a function that sets the expanded state to the given content
   const handleExpand = () =>
-    setExpanded((prev) => (prev === content ? '' : content));
+    setExpandedBox((prev) => (prev === content ? '' : content));
 
   if (!isActive) return null;
 

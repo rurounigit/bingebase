@@ -5,26 +5,19 @@ export const Pages = ({
   pages,
   setPages,
   totalResults,
-  onAddPage,
-  onRemovePage,
+  setPaginationDirection,
 }) => {
   const handleAddPage = () => {
-    const totalPages = Math.trunc(totalResults / 10);
-
-    setPages((prevPages) => {
-      const newCurrent =
-        prevPages.current <= totalPages
-          ? prevPages.current + 1
-          : prevPages.current;
-
-      const updatedPages = {
-        ...prevPages,
-        previous: prevPages.current,
-        current: newCurrent,
-      };
-      onAddPage(updatedPages);
-      return updatedPages;
-    });
+    const newPages = {
+      ...pages,
+      previous: Number(pages.current),
+      current:
+        Number(pages.current) <= Math.trunc(totalResults / 10)
+          ? Number(pages.current) + 1
+          : Number(pages.current),
+    };
+    setPages(newPages);
+    setPaginationDirection('increment');
   };
 
   const handleRemovePage = () => {
@@ -35,8 +28,8 @@ export const Pages = ({
         current: Number(pages.current) <= 1 ? 1 : +pages.current - 1,
       };
       setPages(newPages);
+      setPaginationDirection('decrement');
     }
-    onRemovePage();
   };
 
   return (

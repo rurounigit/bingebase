@@ -35,10 +35,7 @@ export default function App() {
 
   const [query, setQuery] = useState('');
   const [pages, setPages] = useState({ previous: 1, current: 1 });
-  const [nextPageData, setNextPageData] = useState(null);
-  const [searchResultsDisplayData, setSearchResultsDisplayData] =
-    useState([]);
-  const [data, setData] = useState([]);
+  const [paginationDirection, setPaginationDirection] = useState('');
   const [filters, setFilters] = useLocalStorage({}, 'filters');
   const [sortBy, setSortBy] = useLocalStorage('Title', 'sortBy');
   const [isReversed, setIsReversed] = useLocalStorage(
@@ -56,12 +53,213 @@ export default function App() {
     enabled: query.length >= 3,
     placeholderData: keepPreviousData,
     staleTime: Infinity,
+    //  refetchOnMount: false,
   });
 
   // Prefetch, helps but doesn't solve the problem
   const queryClient = useQueryClient();
 
-  const firstPageData = firstPage?.data?.Search;
+  useEffect(() => {
+    if (query.length >= 3) {
+      const prefetchPages = [
+        pages.current + 1,
+        pages.current + 2,
+        pages.current + 3,
+      ];
+
+      prefetchPages.forEach((page) => {
+        queryClient.prefetchQuery({
+          queryKey: ['nextPage', query, page],
+          queryFn: () => fetchMovies(query, page),
+          // Optional: Add staleTime and other options as needed
+          staleTime: Infinity,
+        });
+      });
+    }
+  }, [query, pages, queryClient]);
+
+  const nextPage = useQuery({
+    queryKey: ['nextPage', query, pages.current],
+    queryFn: () => fetchMovies(query, pages.current),
+    enabled:
+      query.length >= 3 &&
+      pages.current > 1 &&
+      // if we descrease pages, we don"t want the next page to be fetched
+      // it is still in the cache
+      /*  pages.current > pages.previous, */
+      paginationDirection === 'increment',
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+  });
+
+  let searchResultsDisplayData = [];
+  let data = [];
+
+  /*  // Compose AllPages and determine data source
+  if (firstPage.isSuccess && nextPage.isSuccess) {
+    // if increases page number, add next 10 results and filter out duplicates
+    if (pages.current > pages.previous) {
+      allPages.current = [
+        ...new Set([
+          ...allPages.current,
+          ...firstPage.data.Search,
+          ...nextPage.data.Search,
+        ]),
+      ];
+      // if descreases page number, if more than 10 items, left, remove previous 10 results
+    } else if (pages.current < pages.previous) {
+      if (allPages.current.length > pages.current * 10) {
+        allPages.current = [...allPages.current].slice(
+          0,
+          allPages.current.length -
+            (pages.previous - pages.current) * 10
+        );
+      }
+    } else if (pages.current === pages.previous) {
+      allPages.current = firstPage.data.Search;
+    }
+
+    data = allPages.current; // Use allPages if available
+  } else if (!firstPage.isPending && firstPage?.data?.Search) {
+    data = firstPage.data.Search; // Use firstPage if allPages isn't ready
+  }
+
+  // Filtering, Sorting, and Reversal (if data exists)
+  if (data.length > 0) {
+    searchResultsDisplayData = sort(
+      filter(data, filters),
+      sortBy,
+      data
+    );
+    if (isReversed) {
+      searchResultsDisplayData.reverse();
+    }
+  } */
+
+  /* global BigInt */
+
+  /*  console.log(
+    allPages.current.length -
+      Number(BigInt(allPages.current.length) / BigInt(10)) * 10
+  ); */
+
+  // Compose AllPages and determine data source
+
+  if (firstPage.isSuccess && nextPage.isSuccess) {
+    console.log('firstPage.isSuccess && nextPage.isSuccess');
+    // if  page number increments, add next 10 results and filter out duplicates
+    if (
+      paginationDirection === 'increment' &&
+      !nextPage.isPlaceholderData
+    ) {
+      console.log('paginationDirection === increment');
+      allPages.current = [
+        ...new Set([
+          ...allPages.current,
+          ...firstPage.data.Search,
+          ...nextPage.data.Search,
+        ]),
+      ];
+      console.log('pages added');
+      // if descreases page number
+    } else if (paginationDirection === 'decrement') {
+      console.log('PaginationDirection === decrement');
+      console.log(
+        'allPages.current.length:',
+        allPages.current.length
+      );
+      console.log('pages.current:', pages.current);
+      console.log(
+        'fistPage.data.totalResults:',
+        firstPage.data.totalResults
+      );
+      // if more than 10 items left
+      if (allPages.current.length > pages.current * 10) {
+        console.log('more than ten items left in allPages.current');
+        // if the user reached the last page
+        if (
+          allPages.current.length ===
+          Number(firstPage.data.totalResults)
+        ) {
+          console.log('last page');
+          // don't remove 10 items, remove number of times till reaching a multiple of 10
+          allPages.current = [...allPages.current].slice(
+            0,
+            allPages.current.length -
+              (allPages.current.length -
+                Number(BigInt(allPages.current.length) / BigInt(10)) *
+                  10)
+          );
+        } else {
+          console.log('not last page, remove 10 items');
+          allPages.current = [...allPages.current].slice(
+            0,
+            allPages.current.length -
+              (pages.previous - pages.current) * 10
+          );
+        }
+      }
+      console.log('pages removed');
+    } else if (pages.current === 1) {
+      console.log('pages.current === 1');
+      allPages.current = firstPage.data.Search;
+      console.log('set allPages to firstPage');
+    }
+
+    data = allPages.current; // Use allPages if available
+  } else if (!firstPage.isPending && firstPage?.data?.Search) {
+    data = firstPage.data.Search; // Use firstPage if allPages isn't ready
+  }
+
+  // Filtering, Sorting, and Reversal (if data exists)
+  if (data.length > 0) {
+    searchResultsDisplayData = sort(
+      filter(data, filters),
+      sortBy,
+      data
+    );
+    if (isReversed) {
+      searchResultsDisplayData.reverse();
+    }
+  }
+
+  /* console.log(
+    'allPages.current:',
+    JSON.stringify(allPages.current, null, 2)
+  );
+  console.log('query:', JSON.stringify(query, null, 2));
+  console.log('pages:', JSON.stringify(pages, null, 2));
+  console.log('firstPage:', JSON.stringify(firstPage, null, 2));
+  console.log('nextPage:', JSON.stringify(nextPage, null, 2)); */
+  console.log(
+    'searchResultsDisplayData:',
+    JSON.stringify(searchResultsDisplayData, null, 2)
+  );
+  console.log(
+    'allPages.current:',
+    JSON.stringify(allPages.current, null, 2)
+  );
+
+  /*  // compose AllPages depending on availability of firstPage and nextPage and of page number change direction
+  if (firstPage.isSuccess && nextPage.isSuccess) {
+    if (pages.current > pages.previous) {
+      allPages.current = [
+        ...new Set([
+          ...allPages.current,
+          ...firstPage.data.Search,
+          ...nextPage.data.Search,
+        ]),
+      ];
+    } else {
+      if (allPages.current.length > pages.current * 10) {
+        allPages.current = [...allPages.current].slice(
+          0,
+          allPages.current.length -
+            (pages.previous - pages.current) * 10
+        );
+      }
+    }
+  } */
 
   const [initialWatched, setInitialWatched] = useLocalStorage(
     [],
@@ -119,6 +317,26 @@ export default function App() {
     return entries.map(([value, count]) => ({ value, count }));
   };
 
+  /*  let searchResultsDisplayData = [];
+  let data = [];
+
+  if (allPages.current.length !== 0) {
+    data = allPages.current;
+  } else if (!firstPage.isPending && firstPage?.data?.Search) {
+    data = firstPage?.data?.Search;
+  }
+
+  if (data.length > 0) {
+    searchResultsDisplayData = sort(
+      filter(data, filters),
+      sortBy,
+      data
+    );
+    if (isReversed) {
+      searchResultsDisplayData.reverse();
+    }
+  } */
+
   const uniqueFilters = {
     searchResults: {
       Year: prepOptions({
@@ -167,6 +385,11 @@ export default function App() {
       }),
     },
   };
+
+  console.log(
+    'uniqueFilters:',
+    JSON.stringify(uniqueFilters.searchResults, null, 2)
+  );
 
   const [filtersWatched, setFiltersWatched] = useLocalStorage(
     {},
@@ -224,6 +447,27 @@ export default function App() {
       return newFilters;
     });
   };
+
+  /* const handleRemoveFilters = (key, valueToRemove) => {
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters };
+
+      if (valueToRemove !== undefined) {
+        // Check if valueToRemove is provided (meaning it's an array filter)
+        updatedFilters[key] = updatedFilters[key].filter(
+          (value) => value !== valueToRemove
+        );
+        if (updatedFilters[key].length === 0) {
+          // Remove the key if the array becomes empty
+          delete updatedFilters[key];
+        }
+      } else {
+        delete updatedFilters[key];
+      }
+
+      return updatedFilters;
+    });
+  }; */
 
   const handleRemoveFilterWatched = (key, valueToRemove) => {
     setFiltersWatched((prevFilters) => {
@@ -321,99 +565,261 @@ export default function App() {
     cleanupRef.current = () => {
       setIsReversed(false);
       setPages({ previous: 1, current: 1 });
+      setPaginationDirection('');
       setSortBy('Title');
       allPages.current = [];
     };
   };
 
-  const handleAddPage = async (pages) => {
-    if (query.length >= 3 && pages.current > 1) {
-      try {
-        const nextPage = await queryClient.fetchQuery({
-          queryKey: ['nextPage', query, pages.current], // Use updated pages.current
-          queryFn: () => fetchMovies(query, pages.current), // Use updated pages.current
-          placeholderData: queryClient.getQueryData([
-            'nextPage',
-            query,
-            pages.current - 1,
-          ]),
-          staleTime: Infinity,
-        });
-        console.log('nextPage query executed');
-        // if last page
-        if (nextPage.Response === 'False') {
-          console.log('last page');
-          if (allPages.current.length > pages.current * 10) {
-            // Reached last page, remove items to align with page size
-            const remainder = allPages.current.length % 10;
-            allPages.current = allPages.current.slice(
-              0,
-              allPages.current.length - remainder
-            );
-          }
-        }
+  /*  setIsLoading(isLoading); */
 
-        if (nextPage.Response === 'True') {
-          console.log('nextPage Response is True');
-          setNextPageData(nextPage);
-          allPages.current = [
-            ...new Set([
-              ...allPages.current,
-              ...firstPage.data.Search,
-              ...nextPage.Search, // Only add new page data
-            ]),
-          ];
-        }
-      } catch (error) {
-        console.error('Error fetching next page:', error);
-      }
-    }
-  };
+  // ... (Remove the cleanupRef and its related logic) ...
 
-  const handleRemovePage = () => {
-    if (
-      pages.current > 1 &&
-      allPages.current.length >= pages.current * 10
-    ) {
-      console.log('handleRemovePage');
-      // Remove items from the end based on page difference
-      allPages.current = allPages.current.slice(
-        0,
-        allPages.current.length - 10
-      );
-    }
-  };
+  /*  // event handler to load more pages or remove pages
+  const handlePageChange = async (newPages) => {
+    const current = newPages.current;
+    const previous = newPages.previous;
+    let n = 0;
 
-  // handling filter, sort and invert/reverse order for search results
-  useEffect(() => {
-    let newData = allPages.current;
-    if (pages.current === 1) {
-      newData = firstPageData;
-    }
-    // Apply filtering, sorting, and reversal if data exists
-    if (newData?.length > 0) {
-      let processedData = sort(
-        filter(newData, filters),
-        sortBy,
-        newData
-      );
-      if (isReversed) {
-        processedData.reverse();
-      }
-      setSearchResultsDisplayData(processedData);
+    // query is empty, so the page doesn't change (loop below to fetch more data will not run)
+    if (query.length === 0) {
+      n = current;
+      // direction is remove page, so we remove the number of pages (a 10 items) that we went down
+      // (loop below to fetch more data will not run)
+    } else if (current < previous) {
+      n = current;
+      const newSearchResults = (searchResults) =>
+        [...initialSearchResults].slice(
+          0,
+          initialSearchResults.length - (previous - current) * 10
+        );
+      // update initialSearchResults (for holding all results)
+      // searchResults (for holding the results after filtering and sorting)
+      // is updated by the useEffect further down)
+      setInitialSearchResults(newSearchResults);
+      // direction is add page, so we set n to the previous page number and we
+      // loop through all pages from the previous page to the current page below
     } else {
-      setSearchResultsDisplayData(firstPageData ? firstPageData : []); // Clear the results if data is empty
+      n = previous;
+      if (current !== searchResults.length) {
+        n = 1;
+      }
+
     }
 
-    setData(newData);
-  }, [
-    pages,
-    firstPageData,
-    filters,
-    sortBy,
-    isReversed,
-    nextPageData,
-  ]);
+
+    while (n < current) {
+      // the first page is already loaded in the other event handler for the Search component
+      // so we add 1 to the page number
+      n++;
+
+      try {
+        setIsLoading(true);
+        setHasError('');
+
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}&page=${n}`
+        );
+
+        if (!res.ok) throw new Error("Couldn't load movie details.");
+
+        const data = await res.json();
+
+        if (data.Response === 'False')
+          throw new Error('No results found.');
+
+        // update totalResults
+        setTotalResults(data.totalResults);
+
+         // Filter out duplicate results based on imdbID
+        const newResults = data.Search.filter(
+          (newResult) =>
+            !initialSearchResults.some(
+              (existingResult) =>
+                existingResult.imdbID === newResult.imdbID
+            )
+        );
+
+
+
+          // add the new results/items to the already existing values in initialSearchResults
+        //const newSearchResults = (searchResults) => [
+        //  ...initialSearchResults,
+        //  ...data.Search,
+        //];
+
+        // Add the unique new results
+        const updatedSearchResults = [
+          ...initialSearchResults,
+          ...newResults,
+        ];
+
+        setInitialSearchResults(updatedSearchResults);
+
+        // setInitialSearchResults(newSearchResults);
+
+        setHasError('');
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        setHasError(err.message || "Couldn't load movies.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }; */
+
+  /* const handlePageChange = async (newPages) => {
+    const current = newPages.current;
+    const previous = newPages.previous;
+    let n = 0;
+
+    if (query.length === 0) {
+      n = current;
+    } else if (current < previous) {
+      n = current;
+      const newSearchResults = [...initialSearchResults].slice(
+        0,
+        initialSearchResults.length - (previous - current) * 10
+      );
+      setInitialSearchResults(newSearchResults);
+    } else {
+      n = previous;
+    }
+
+    let tempResults = [];
+
+    while (n < current) {
+      let currentTempResults = [...tempResults];
+      n++;
+
+      try {
+        setIsLoadingLegacy(true);
+        setHasError('');
+
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}&page=${n}`
+        );
+
+        if (!res.ok) throw new Error("Couldn't load movie details.");
+
+        const data = await res.json();
+
+        if (data.Response === 'False')
+          throw new Error('No results found.');
+
+        const newResults = data.Search.filter(
+          (newResult) =>
+            !currentTempResults.some(
+              (existingResult) =>
+                existingResult.imdbID === newResult.imdbID
+            )
+        );
+        tempResults = [...tempResults, ...newResults];
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        setHasError(err.message || "Couldn't load movies.");
+        //Important: break out of the loop on error
+        break;
+      } finally {
+        setIsLoadingLegacy(false);
+      }
+    } // End of the while loop
+
+    setInitialSearchResults((prevResults) => [
+      ...prevResults,
+      ...tempResults,
+    ]);
+
+    //Set TotalResults outside the loop
+    try {
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}&page=1`
+      );
+      if (!res.ok) throw new Error("Couldn't load movie details.");
+      const data = await res.json();
+      setTotalResults(data.totalResults);
+    } catch (error) {
+      console.error('Failed to fetch total results', error);
+    }
+  }; */
+
+  /* // handling filter, sort and invert/reverse order for searchResults
+  useEffect(() => {
+    setSearchResults((prevlist) => {
+      if (!initialSearchResults) return prevlist;
+      let newList = filter(initialSearchResults, filters);
+      newList = sort(newList, sortBy, initialSearchResults);
+      if (isReversed) newList = [...newList].reverse();
+
+      return newList;
+    });
+  }, [filters, initialSearchResults, isReversed, sortBy]); */
+
+  /*  let searchResultsDisplayData = [];
+  if (allPages.current.length !== 0) {
+    searchResultsDisplayData = isReversed
+      ? sort(
+          filter(allPages.current, filters),
+          sortBy,
+          allPages.current
+        )
+          .slice()
+          .reverse()
+      : sort(
+          filter(allPages.current, filters),
+          sortBy,
+          allPages.current
+        );
+  } else if (!firstPage.isPending) {
+    searchResultsDisplayData = isReversed
+      ? sort(
+          filter(firstPage?.data?.Search, filters),
+          sortBy,
+          firstPage.data?.Search
+        )
+          .slice()
+          .reverse()
+      : sort(
+          filter(firstPage?.data?.Search, filters),
+          sortBy,
+          firstPage?.data?.Search
+        );
+  } */
+
+  /* let searchResultsDisplayData = [];
+  const data =
+    allPages.current.length !== 0
+      ? allPages.current
+      : firstPage.isPending
+      ? []
+      : firstPage?.data?.Search;
+
+  if (data.length > 0) {
+    searchResultsDisplayData = sort(filter(data, filters), sortBy, data);
+    if (isReversed) {
+      searchResultsDisplayData.reverse();
+    }
+  } */
+
+  /* let searchResultsDisplayData = [];
+  let data = [];
+
+  if (allPages.current.length !== 0) {
+    data = allPages.current;
+  } else if (!firstPage.isPending && firstPage?.data?.Search) {
+    data = firstPage?.data?.Search;
+  }
+
+  if (data.length > 0) {
+    searchResultsDisplayData = sort(
+      filter(data, filters),
+      sortBy,
+      data
+    );
+    if (isReversed) {
+      searchResultsDisplayData.reverse();
+    }
+  } */
 
   // handling filter, sort and invert/reverse order for watchlistFiltered
   useEffect(() => {
@@ -460,9 +866,7 @@ export default function App() {
               pages={pages}
               setPages={setPages}
               totalResults={firstPage.data?.totalResults}
-              /* setPaginationDirection={setPaginationDirection} */
-              onAddPage={handleAddPage}
-              onRemovePage={handleRemovePage}
+              setPaginationDirection={setPaginationDirection}
             />
             <FilterTags
               filters={filters}
@@ -532,7 +936,7 @@ export default function App() {
             >
               <NumResultsSearchResults
                 firstPage={firstPage}
-                nextPage={nextPageData}
+                nextPage={nextPage}
                 data={searchResultsDisplayData}
               />
             </NumResults>
