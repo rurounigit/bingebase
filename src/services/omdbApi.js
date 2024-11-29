@@ -5,7 +5,7 @@ import { KEY } from '../components/App/App';
 const fetchData = async (url) => {
   const res = await fetch(url);
   if (!res || !res.ok) {
-    throw new Error("Couldn't load movie details.");
+    throw new Error("Couldn't load data.");
   }
   const data = await res.json();
   if (data.Response === 'False') {

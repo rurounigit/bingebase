@@ -23,7 +23,7 @@ export const WatchedMoviesListProps = ({
             prop.value !== undefined
         )
         .map((prop) => (
-          <p key={prop.label}>
+          <p key={prop.label} className={prop.label}>
             {prop.icon}{' '}
             {prop.value !== 'movie' &&
             prop.value !== 'series' &&

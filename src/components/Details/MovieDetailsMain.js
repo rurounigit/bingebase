@@ -32,7 +32,7 @@ export const MovieDetailsMain = ({
             className="btn-add"
             onClick={() => onAddMovie(savedRating, movie)}
           >
-            + Add to list
+            + Add to watched
           </Button>
         )}
       </div>

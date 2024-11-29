@@ -6,20 +6,29 @@ export const NumResults = ({
   expandedBox,
   setExpandedBox,
   content,
+  onAddAllResults,
+  onClearWatched,
   children,
+  isDetails = false,
+  onDeleteMovie,
+  selectedID,
+  onCloseMovie,
 }) => {
   // true if this component instance (whith the given content) is expanded
   const isExpanded = expandedBox === content;
   // if the content is watched, the direction is left to right,
   // otherwise right to left
-  const direction =
+  let direction =
     content === 'watched'
       ? isExpanded
-        ? 'LeftToRight'
-        : 'RightToLeft'
+        ? 'LeftToRightWatched'
+        : 'RightToLeftWatched'
       : isExpanded
-      ? 'RightToLeft'
-      : 'LeftToRight';
+      ? 'RightToLeftSearchResults'
+      : 'LeftToRightSearchResults';
+  if (isDetails) direction = 'RightToLeftDetails';
+  if (isDetails && isExpanded) direction = 'LeftToRightDetails';
+
   // handleExpand is a function that sets the expanded state to the given content
   const handleExpand = () =>
     setExpandedBox((prev) => (prev === content ? '' : content));
@@ -34,24 +43,154 @@ export const NumResults = ({
         display: 'flex',
         border: 'none',
         borderRadius: '0rem',
-        zIndex: 2, // No need for string '998'
+        borderBottom: '2px solid  var(--color-background-50)',
+
+        zIndex: 2,
         backgroundColor: 'var(--color-background-500)',
+        alignItems: 'center',
       }}
     >
       <div
         style={{
-          margin: '0rem', // This can be removed, margin: 0 is default
           padding: '0.5rem 1rem',
+          marginBottom: '0.1rem',
           fontSize: '1.4rem',
-          opacity: isActive ? 0.3 : 0, // No need for string '0.3' or '0'
+          opacity: isActive ? 0.3 : 0,
         }}
       >
         {children}
       </div>
       <button className="btn-toggle-box" onClick={handleExpand}>
-        {direction === 'LeftToRight' && <>&#8677;</>}
-        {direction === 'RightToLeft' && <>&#8676;</>}
+        {direction === 'LeftToRightWatched' && (
+          <>
+            &#8677;
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'normal',
+                marginLeft: '0.5rem',
+              }}
+            >
+              show search results
+            </span>
+          </>
+        )}
+        {direction === 'LeftToRightSearchResults' && (
+          <>
+            &#8677;
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'normal',
+                marginLeft: '0.5rem',
+              }}
+            >
+              expand search results
+            </span>
+          </>
+        )}
+        {direction === 'RightToLeftDetails' && (
+          <>
+            &#8676;
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'normal',
+                marginLeft: '0.5rem',
+              }}
+            >
+              expand details
+            </span>
+          </>
+        )}
+        {direction === 'LeftToRightDetails' && (
+          <>
+            &#8677;
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'normal',
+                marginLeft: '0.5rem',
+              }}
+            >
+              show search results
+            </span>
+          </>
+        )}
+        {direction === 'RightToLeftWatched' && (
+          <>
+            &#8676;{' '}
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'normal',
+                marginLeft: '0.5rem',
+              }}
+            >
+              expand watched
+            </span>
+          </>
+        )}
+        {direction === 'RightToLeftSearchResults' && (
+          <>
+            &#8676;{' '}
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'normal',
+                marginLeft: '0.5rem',
+              }}
+            >
+              show watched
+            </span>
+          </>
+        )}
       </button>
+      {content === 'searchResults' && (
+        <button
+          className="btn-add-all-results"
+          onClick={onAddAllResults}
+        >
+          <span
+            style={{
+              fontWeight: 'normal',
+              fontSize: '1.5rem',
+              paddingRight: '0.5rem',
+            }}
+          >
+            ❖{' '}
+          </span>{' '}
+          add to watched
+        </button>
+      )}
+      {content === 'watched' && !isDetails && (
+        <button
+          className="btn-add-all-results"
+          onClick={onClearWatched}
+        >
+          <span
+            style={{
+              fontWeight: 'normal',
+              fontSize: '1.5rem',
+              paddingRight: '0.5rem',
+            }}
+          >
+            ❖{' '}
+          </span>{' '}
+          clear
+        </button>
+      )}
+      {content === 'watched' && isDetails && (
+        <button
+          className="btn-delete-details"
+          onClick={() => {
+            onDeleteMovie(selectedID);
+            onCloseMovie();
+          }}
+        >
+          –
+        </button>
+      )}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 
 export const Search = ({
-  query,
-  setQuery,
+  input,
+  setInput,
   onSearchChange,
   pages,
 }) => {
@@ -13,9 +13,9 @@ export const Search = ({
       className="search-navbar"
       type="text"
       placeholder="Search movies..."
-      value={query}
+      value={input}
       onChange={(e) => {
-        setQuery(e.target.value);
+        setInput(e.target.value);
         onSearchChange(e.target.value);
       }}
       ref={inputEl}

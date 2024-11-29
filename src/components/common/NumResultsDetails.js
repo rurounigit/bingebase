@@ -1,4 +1,4 @@
-export const NumResultsSearchResults = ({
+export const NumResultsDetails = ({
   firstPageIsFetching,
   firstPageData,
   nextPageIsPending,

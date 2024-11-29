@@ -61,6 +61,7 @@ export default function App() {
   const nextPage = useLoadNextPage(query, pages);
   const nextPageIsPending = nextPage.isPending;
   const nextPageIsFetching = nextPage.isFetching;
+  const nextPageStatus = nextPage.status;
 
   // addAllResults query / fetching
   const isAddingAllResults = useRef(false);
@@ -69,12 +70,8 @@ export default function App() {
     (item) => item.imdbID
   );
 
-  const {
-    allDetailsData,
-    allDetailsIsLoading,
-    allDetailsError,
-    allDetailsIsFetching,
-  } = useLoadAllDetails(allSelectedIDs, isAddingAllResults);
+  const { allDetailsData, allDetailsIsLoading, allDetailsError } =
+    useLoadAllDetails(allSelectedIDs, isAddingAllResults);
 
   const [initialWatched, setInitialWatched] = useLocalStorage(
     [],
@@ -148,14 +145,8 @@ export default function App() {
     { value: 'Title', label: 'Title', icon: '#️⃣' },
   ].filter((option) => filtersWatched[option.value] === undefined);
 
-  const handleCloseAddAllResultsModal = () => {
-    setIsAddingAllResultsModalOpen(false);
-    isAddingAllResults.current = false;
-  };
-
   const handleSubmitAddAllResults = () => {
     setIsAddingAllResultsModalOpen(false);
-    isAddingAllResults.current = false;
     if (!allDetailsData || allDetailsIsLoading || allDetailsError)
       return;
     setInitialWatched((prevWatched) => {
@@ -431,21 +422,36 @@ export default function App() {
   // adds accumulated pages to the search results
   useEffect(() => {
     if (!firstPageError) {
-      const PageDataTuples = queryClient.getQueriesData({
+      /*  let accumulatedResults = [];
+      let index = 1;
+
+      while (index < pages.current) {
+        index++;
+        const pageData = queryClient.getQueryData([
+          'nextPage',
+          query,
+          index,
+        ]);
+        if (pageData) {
+          accumulatedResults.push(...pageData.Search);
+        }
+      }
+
+      setSearchResultsAll((prev) => [
+        ...new Set([...prev, ...accumulatedResults]),
+      ]); */
+
+      /*  const PageData = queryClient.getQueriesData([
+        'nextPage',
+        query,
+      ]); */
+
+      const PageData = queryClient.getQueriesData({
         queryKey: ['nextPage', query],
-        predicate: (queryObj) => {
-          const [name, query, page] = queryObj.queryKey;
-          if (name === 'nextPage' && typeof page === 'number') {
-            return page >= 2 && page <= pages.current;
-          }
-          return false;
-        },
+        /*  exact: true, */
       });
 
-      if (PageDataTuples.length > 1) {
-        const PageData = PageDataTuples.flatMap(
-          ([, data]) => data?.Search ?? []
-        );
+      if (PageData.length > 1) {
         setSearchResultsAll((prev) => [
           ...new Set([...prev, ...PageData]),
         ]);
@@ -463,274 +469,22 @@ export default function App() {
 
   return (
     <>
-      {isAddingAllResultsModalOpen && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center', // Center horizontally
-            alignItems: 'center', // Center vertically
-            position: 'fixed',
-            zIndex: '999',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.3)', // Optional: Semi-transparent background for overlay
-          }}
-        >
-          <div
-            className="add-all-results-modal"
-            style={{
-              width: '20rem',
-              height: '18rem',
-              fontSize: '1.6rem',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'left',
-              flexDirection: 'column', // Stack content vertically
-              padding: '1rem',
-              gap: '1.2rem',
-            }}
-          >
-            {allDetailsIsFetching ? (
-              <span>
-                <svg
-                  width="22"
-                  height="12"
-                  viewBox="0 5 24 14"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="4" cy="12" r="0" fill="white">
-                    <animate
-                      begin="0;spinner_z0Or.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="0;3"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_OLMs.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="4;12"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_UHR2.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="12;20"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_lo66"
-                      begin="spinner_Aguh.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="3;0"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_z0Or"
-                      begin="spinner_lo66.end"
-                      attributeName="cx"
-                      dur="0.001s"
-                      values="20;4"
-                      fill="freeze"
-                    />
-                  </circle>
-                  <circle cx="4" cy="12" r="3" fill="white">
-                    <animate
-                      begin="0;spinner_z0Or.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="4;12"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_OLMs.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="12;20"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_JsnR"
-                      begin="spinner_UHR2.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="3;0"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_Aguh"
-                      begin="spinner_JsnR.end"
-                      attributeName="cx"
-                      dur="0.001s"
-                      values="20;4"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_Aguh.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="0;3"
-                      fill="freeze"
-                    />
-                  </circle>
-                  <circle cx="12" cy="12" r="3" fill="white">
-                    <animate
-                      begin="0;spinner_z0Or.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="12;20"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_hSjk"
-                      begin="spinner_OLMs.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="3;0"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_UHR2"
-                      begin="spinner_hSjk.end"
-                      attributeName="cx"
-                      dur="0.001s"
-                      values="20;4"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_UHR2.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="0;3"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_Aguh.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="4;12"
-                      fill="freeze"
-                    />
-                  </circle>
-                  <circle cx="20" cy="12" r="3" fill="white">
-                    <animate
-                      id="spinner_4v5M"
-                      begin="0;spinner_z0Or.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="3;0"
-                      fill="freeze"
-                    />
-                    <animate
-                      id="spinner_OLMs"
-                      begin="spinner_4v5M.end"
-                      attributeName="cx"
-                      dur="0.001s"
-                      values="20;4"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_OLMs.end"
-                      attributeName="r"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="0;3"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_UHR2.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="4;12"
-                      fill="freeze"
-                    />
-                    <animate
-                      begin="spinner_Aguh.end"
-                      attributeName="cx"
-                      calcMode="spline"
-                      dur="0.5s"
-                      keySplines=".36,.6,.31,1"
-                      values="12;20"
-                      fill="freeze"
-                    />
-                  </circle>
-                </svg>
-              </span>
-            ) : (
-              <span style={{ margin: '1.6rem 1.6rem 0rem 1.6rem' }}>
-                Add all {allDetailsData.length} items to watched?
-              </span>
-            )}
-            <button
-              className="btn-add"
-              /*  style={{
-                backgroundColor: 'var(--color-primary-light)',
-                color: 'var(--color-text)',
-                fontSize: '1.4rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-
-                borderRadius: '0.6rem',
-                border: 'none',
-                margin: '0rem 1.6rem 0rem 1.6rem',
-                padding: '1rem',
-              }} */
-              onClick={handleSubmitAddAllResults}
-            >
-              ❖ Add them
-            </button>
-            <button
-              className="btn-close-add-all-results-modal"
-              onClick={handleCloseAddAllResultsModal}
-              style={
-                {
-                  /*  borderRadius: '0.6rem', */
-                  /*  border: 'none', */
-                  /*  margin: '0rem 0.8rem 0.8rem 0.8rem',
-                padding: '0.4rem', */
-                }
-              }
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      <div
+        style={{
+          position: 'absolute',
+          zIndex: '999',
+          display: isAddingAllResultsModalOpen ? 'flex' : 'none',
+          left: '20%',
+          top: '50%',
+          backgroundColor: 'black',
+          width: '15rem',
+          height: '20rem',
+          fontSize: '10rem',
+        }}
+      >
+        Really???
+        <button onClick={handleSubmitAddAllResults}>Yea!!</button>
+      </div>
 
       <Navbar>
         <Search
@@ -828,7 +582,6 @@ export default function App() {
             >
               <NumResultsSearchResults
                 firstPageIsFetching={firstPageIsFetching}
-                nextPageIsFetching={nextPageIsFetching}
                 firstPageData={firstPageData}
                 nextPageIsPending={nextPageIsPending}
                 searchResultsDisplayData={searchResultsDisplayData}
@@ -862,34 +615,14 @@ export default function App() {
             />
 
             {selectedID ? (
-              <>
-                {/*  <NumResults
-                  isActive={true}
-                  isFilterFormOpen={false}
-                  topOpen={'4.4rem'}
-                  topClosed={'0rem'}
-                  isDetails={true}
-                  expandedBox={expandedBox}
-                  setExpandedBox={setExpandedBox}
-                  content="watched"
-                  onClearWatched={handleClearWatched}
-                >
-                  showing <strong>1</strong> of{' '}
-                  <strong>{initialWatched.length}</strong> results
-                </NumResults> */}
-                <MovieDetails
-                  selectedID={selectedID}
-                  onCloseMovie={handleCloseMovie}
-                  onAddMovie={handleAddMovie}
-                  onDeleteMovie={handleDeleteMovie}
-                  initialWatched={initialWatched}
-                  searchResultsDisplayData={searchResultsDisplayData}
-                  expandedBox={expandedBox}
-                  setExpandedBox={setExpandedBox}
-                  OnClearWatched={handleClearWatched}
-                  initialWatchedLength={initialWatched.length}
-                />
-              </>
+              <MovieDetails
+                selectedID={selectedID}
+                onCloseMovie={handleCloseMovie}
+                onAddMovie={handleAddMovie}
+                onDeleteMovie={handleDeleteMovie}
+                initialWatched={initialWatched}
+                searchResultsDisplayData={searchResultsDisplayData}
+              />
             ) : (
               <>
                 <WatchedSummary
@@ -923,20 +656,3 @@ export default function App() {
     </>
   );
 }
-
-/* <div
-        style={{
-          position: 'absolute',
-          zIndex: '999',
-          display: isAddingAllResultsModalOpen ? 'flex' : 'none',
-          left: '20%',
-          top: '50%',
-          backgroundColor: 'black',
-          width: '15rem',
-          height: '20rem',
-          fontSize: '10rem',
-        }}
-      >
-        {allDetailsIsFetching ? 'Loading...' : 'Really???'}
-        <button onClick={handleSubmitAddAllResults}>Yea!!</button>
-      </div> */

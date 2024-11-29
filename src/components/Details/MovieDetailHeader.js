@@ -87,10 +87,11 @@ export const MovieDetailHeader = ({ movie, onCloseMovie }) => {
               <NegativeSVG />
             ) : null}
             {Ratings?.[1]?.Value}
-
-            <span style={{ opacity: '0.4' }}>
-              {' Rotten Tomatoes'}
-            </span>
+            {Ratings?.[1]?.Value ? (
+              <span style={{ opacity: '0.4' }}>
+                {' Rotten Tomatoes'}
+              </span>
+            ) : null}
           </a>
         ) : null}
 

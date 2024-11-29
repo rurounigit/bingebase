@@ -6,6 +6,7 @@ import { useKey } from '../../hooks/useKey';
 import { MovieDetailHeader } from './MovieDetailHeader';
 import { MovieDetailsMain } from './MovieDetailsMain';
 import { fetchMovieDetails } from '../../services/omdbApi';
+import { NumResults } from '../common/NumResults';
 
 export const MovieDetails = ({
   selectedID,
@@ -13,6 +14,11 @@ export const MovieDetails = ({
   onAddMovie,
   onDeleteMovie,
   initialWatched,
+  searchResultsDisplayData,
+  expandedBox,
+  setExpandedBox,
+  onClearWatched,
+  initialWatchedLength,
 }) => {
   const savedRating =
     initialWatched.find((movie) => movie.imdbID === selectedID)
@@ -60,6 +66,23 @@ export const MovieDetails = ({
 
   return (
     <div className="details header-wrapper">
+      <NumResults
+        isActive={true}
+        isFilterFormOpen={false}
+        topOpen={'4.4rem'}
+        topClosed={'0rem'}
+        isDetails={true}
+        expandedBox={expandedBox}
+        setExpandedBox={setExpandedBox}
+        content="watched"
+        onClearWatched={onClearWatched}
+        onDeleteMovie={onDeleteMovie}
+        selectedID={selectedID}
+        onCloseMovie={onCloseMovie}
+      >
+        showing <strong>1</strong> of{' '}
+        <strong>{initialWatched.length}</strong> results
+      </NumResults>
       {isLoading ? (
         <Loader />
       ) : error ? (

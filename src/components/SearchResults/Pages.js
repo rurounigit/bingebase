@@ -7,9 +7,10 @@ export const Pages = ({
   totalResults,
   onAddPage,
   onRemovePage,
+  nextPage,
 }) => {
   const handleAddPage = () => {
-    const totalPages = Math.trunc(totalResults / 10);
+    const totalPages = Math.trunc(Number(totalResults) / 10);
 
     setPages((prevPages) => {
       const newCurrent =
@@ -22,7 +23,7 @@ export const Pages = ({
         previous: prevPages.current,
         current: newCurrent,
       };
-      onAddPage(updatedPages);
+      onAddPage(updatedPages, totalResults, nextPage);
       return updatedPages;
     });
   };
@@ -35,8 +36,8 @@ export const Pages = ({
         current: Number(pages.current) <= 1 ? 1 : +pages.current - 1,
       };
       setPages(newPages);
+      onRemovePage(newPages, totalResults);
     }
-    onRemovePage();
   };
 
   return (

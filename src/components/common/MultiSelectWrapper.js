@@ -1,11 +1,4 @@
-/* import React, { useState } from 'react'; */
 import { MultiSelect } from 'react-multi-select-component';
-
-/* const options = [
-  { label: 'Action', value: 'grapes' },
-  { label: 'Drama', value: 'mango' },
-  { label: 'Adventure', value: 'strawberry', disabled: true },
-]; */
 
 export const MultiSelectWrapper = ({
   id,
@@ -14,21 +7,8 @@ export const MultiSelectWrapper = ({
   setFilters,
   options,
 }) => {
-  /*  console.log(`${id} filters: ${JSON.stringify(filters)}`); */
-  /*  console.log(`${id} ${JSON.stringify(id)}`); */
-  /* const [selected, setSelected] = useState([]); */
-
   const disableSearch =
     id === 'Type' || id === 'Genre' || options.length < 8;
-
-  /* const selected = (filters[id] || [])
-    .map((value) => {
-      const option = options.find((option) => option.value === value);
-      return option
-        ? { label: `${value} (${option.count})`, value }
-        : null;
-    })
-    .filter(Boolean); */
 
   const selected = (filters[id] || [])
     .map((value) => {
@@ -57,10 +37,6 @@ export const MultiSelectWrapper = ({
     })
     .filter(Boolean);
 
-  // ... (customValueRenderer remains the same)
-
-  /* console.log(`${id} selected: ${JSON.stringify(selected)}`); */
-
   const optionsFormatted = options.map((option) => ({
     label:
       option.count > 1
@@ -69,14 +45,7 @@ export const MultiSelectWrapper = ({
     value: option.value,
   }));
 
-  /*  console.log(`${id} selected: ${JSON.stringify(selected)}`); */
-  /* console.log(`${id} options: ${JSON.stringify(options)}`);
-  console.log(
-    `${id} optionsFormatted: ${JSON.stringify(optionsFormatted)}`
-  ); */ // Log the formatted options
-
   const handleChange = (selectedOptions) => {
-    /*  setSelected(selectedOptions); */
     const selectedValues = selectedOptions.map(
       (option) => option.value
     );
@@ -109,19 +78,6 @@ export const MultiSelectWrapper = ({
   const customValueRenderer = (selected, _options) => {
     return selected.length ? selected.map(({ label }) => label) : id;
   };
-
-  /* const customValueRenderer = (selected, _options) => {
-    return selected.length
-      ? selected.map(({ label }) => {
-          if (!label) return ''; // Handle potential null/undefined labels
-
-          const parts = label.split(' ');
-          if (parts.length === 2) return label; // Return original label if it's a single word
-
-          return parts[0].charAt(0) + '. ' + parts.slice(1).join(' ');
-        })
-      : id;
-  }; */
 
   return (
     <div>

@@ -1,7 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { KEY } from '../components/App';
 
-export function useLoadPages(query, callback, pages) {
+export function useLoadFirstPage, callback, pages) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState('');
   const [searchResults, setSearchResults] = useState([]);
