@@ -1,9 +1,12 @@
-# BingBase is a training / portfolio App.
+# BingBase is a training / portfolio Movie App.
 
-it fetches movie data from the public (and free) Open Movie Database (https://www.omdbapi.com/).
+it fetches movie data from the public (and free) Open Movie Database (https://www.omdbapi.com/) 
+aswell as The Movie Database (https://www.themoviedb.org/.)
 
 you can create a watchlist that gets saved into your local browser storage and give user ratings.
 The search results and watchlist can be filtered, ordered and reversed.
+
+
 
 
 ## Available Scripts
