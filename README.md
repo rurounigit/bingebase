@@ -1,4 +1,4 @@
-# BingBase is a training / portfolio Movie App.
+# BingBase is a Movie App
 
 it fetches movie data from the public (and free) Open Movie Database (https://www.omdbapi.com/) 
 aswell as The Movie Database (https://www.themoviedb.org/.)
